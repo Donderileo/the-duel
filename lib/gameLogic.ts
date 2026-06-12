@@ -42,7 +42,7 @@ const DODGE_PARTIAL_PROTECTIONS: Record<Dodge, Target[]> = {
 const ARM_TARGETS: Target[] = ['left_arm', 'right_arm']
 
 function calcHitChance(shooterPrecision: number, targetReflexes: number): number {
-  const chance = 50 + shooterPrecision * 5 - targetReflexes * 5
+  const chance = 50 + shooterPrecision * 5 - targetReflexes * 4
   return Math.min(95, Math.max(10, chance))
 }
 
@@ -54,7 +54,7 @@ function calcDamage(
   isPartiallyProtected: boolean
 ): number {
   const base = isFullyProtected ? baseDamage * 0.5 : isPartiallyProtected ? baseDamage * 0.85 : baseDamage
-  return base * (1 + Math.pow(shooterDamage, 1.5) * 0.06) * (1 - targetResistance * 0.08)
+  return base * (1 + Math.pow(shooterDamage, 1.5) * 0.06) * (1 - targetResistance * 0.05)
 }
 
 function actionForRound(actions: ActionBlock[], round: number): ActionBlock {
