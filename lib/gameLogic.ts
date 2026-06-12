@@ -43,7 +43,7 @@ function calcDamage(
 ): number {
   let base = baseDamage
   if (isProtected) base *= 0.5
-  return base * (1 + shooterDamage * 0.1) * (1 - targetResistance * 0.08)
+  return base * (1 + Math.pow(shooterDamage, 1.5) * 0.06) * (1 - targetResistance * 0.08)
 }
 
 function actionForRound(actions: ActionBlock[], round: number): ActionBlock {

@@ -31,7 +31,7 @@ const ATTR_ICONS: Record<keyof Attributes, string> = {
 }
 
 const MAX_POINTS = 10
-const MAX_PER_ATTR = 10
+const MAX_PER_ATTR = 8
 
 export default function AttributesPhase({ onConfirm, opponentReady, myReady }: AttributesPhaseProps) {
   const [attrs, setAttrs] = useState<Attributes>({ precision: 0, damage: 0, reflexes: 0, resistance: 0 })

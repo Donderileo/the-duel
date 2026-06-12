@@ -57,7 +57,7 @@ function AttrTable({
                 <motion.div
                   className="h-full rounded-full"
                   initial={{ width: 0 }}
-                  animate={{ width: `${(attrs[key] / 7) * 100}%` }}
+                  animate={{ width: `${(attrs[key] / 8) * 100}%` }}
                   transition={{ duration: 0.55, delay: 0.45 + i * 0.07 }}
                   style={{ background: color }}
                 />

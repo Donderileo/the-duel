@@ -194,7 +194,7 @@ export default function ResolutionPhase({
                                 <motion.div
                                   className="h-full rounded-full"
                                   initial={{ width: 0 }}
-                                  animate={{ width: `${(aiCharacter.attributes[k] / 7) * 100}%` }}
+                                  animate={{ width: `${(aiCharacter.attributes[k] / 8) * 100}%` }}
                                   transition={{ duration: 0.6, delay: 0.1 }}
                                   style={{ background: aiCharacter.color }}
                                 />
