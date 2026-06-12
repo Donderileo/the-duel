@@ -12,16 +12,16 @@ interface AttributesPhaseProps {
 
 const ATTR_KEYS: (keyof Attributes)[] = ['precision', 'damage', 'reflexes', 'resistance']
 const ATTR_LABELS: Record<keyof Attributes, string> = {
-  precision: 'Precisão',
-  damage: 'Dano',
-  reflexes: 'Reflexos',
-  resistance: 'Resistência',
+  precision: 'Precision',
+  damage: 'Damage',
+  reflexes: 'Reflexes',
+  resistance: 'Resistance',
 }
 const ATTR_DESC: Record<keyof Attributes, string> = {
-  precision: '↑ chance de acertar',
-  damage: '↑ multiplicador de dano',
-  reflexes: '↓ chance de acerto rival',
-  resistance: '↓ dano recebido',
+  precision: '↑ hit chance',
+  damage: '↑ damage multiplier',
+  reflexes: '↓ opponent hit chance',
+  resistance: '↓ damage received',
 }
 const ATTR_ICONS: Record<keyof Attributes, string> = {
   precision: '🎯',
@@ -52,9 +52,9 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
     <div className="flex flex-col items-center gap-6">
       <div className="text-center">
         <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>
-          Distribuir Atributos
+          Distribute Attributes
         </h2>
-        <p className="text-white/40 text-sm mt-1">Pontos para distribuir entre os 4 atributos</p>
+        <p className="text-white/40 text-sm mt-1">Spread points across the 4 attributes</p>
       </div>
 
       {/* Points remaining */}
@@ -65,7 +65,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
         <span className="text-5xl font-black" style={{ color: remaining === 0 ? '#2dc653' : '#f5c842' }}>
           {remaining}
         </span>
-        <p className="text-white/50 text-xs uppercase tracking-widest">pontos restantes</p>
+        <p className="text-white/50 text-xs uppercase tracking-widest">points remaining</p>
       </motion.div>
 
       {/* Attributes */}
@@ -107,7 +107,6 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
                 </button>
               </div>
             </div>
-            {/* mini bar */}
             <div className="w-full h-1.5 rounded-full mt-1" style={{ background: 'rgba(255,255,255,0.08)' }}>
               <motion.div
                 className="h-full rounded-full"
@@ -123,10 +122,10 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
       {/* Status */}
       <div className="flex gap-4 text-xs">
         <span style={{ color: myReady ? '#2dc653' : '#f5c842' }}>
-          {myReady ? '✓ Você: Pronto' : `Você: ${used}/10 pts`}
+          {myReady ? '✓ You: Ready' : `You: ${used}/10 pts`}
         </span>
         <span style={{ color: opponentReady ? '#2dc653' : 'rgba(255,255,255,0.3)' }}>
-          {opponentReady ? '✓ Oponente: Pronto' : '○ Oponente: escolhendo...'}
+          {opponentReady ? '✓ Opponent: Ready' : '○ Opponent: choosing...'}
         </span>
       </div>
 
@@ -136,7 +135,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
           disabled={used !== MAX_POINTS}
           className="btn-gold w-full max-w-sm py-4 text-lg"
         >
-          {used === MAX_POINTS ? '🎯 Confirmar Atributos' : `Use todos os ${MAX_POINTS} pontos`}
+          {used === MAX_POINTS ? '🎯 Confirm Attributes' : `Use all ${MAX_POINTS} points`}
         </button>
       )}
 
@@ -146,7 +145,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
           transition={{ duration: 1.5, repeat: Infinity }}
           className="text-white/50 text-sm"
         >
-          Aguardando oponente...
+          Waiting for opponent...
         </motion.p>
       )}
     </div>

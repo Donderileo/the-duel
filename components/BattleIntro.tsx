@@ -15,10 +15,10 @@ interface BattleIntroProps {
 const DURATION = 10000
 
 const ATTR_ROWS: { key: keyof Attributes; icon: string; label: string }[] = [
-  { key: 'precision',  icon: '🎯', label: 'Precisão'   },
-  { key: 'damage',     icon: '💥', label: 'Dano'        },
-  { key: 'reflexes',   icon: '⚡', label: 'Reflexos'   },
-  { key: 'resistance', icon: '🛡️', label: 'Resistência' },
+  { key: 'precision',  icon: '🎯', label: 'Precision'  },
+  { key: 'damage',     icon: '💥', label: 'Damage'     },
+  { key: 'reflexes',   icon: '⚡', label: 'Reflexes'   },
+  { key: 'resistance', icon: '🛡️', label: 'Resistance' },
 ]
 
 function AttrTable({
@@ -103,11 +103,11 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onCo
   const progress = elapsed / DURATION
 
   const flavorLines = [
-    'Os pistoleiros se encaram...',
-    'O vento para. O tempo também.',
-    'Dedos nas coronhas. Olhos no gatilho.',
-    'Apenas um sai de pé.',
-    'Que comecem os tiros.',
+    'The gunslingers face each other...',
+    'The wind stops. Time does too.',
+    'Fingers on holsters. Eyes on the trigger.',
+    'Only one walks away.',
+    'Let the shooting begin.',
   ]
   const lineIndex = Math.min(Math.floor(progress * flavorLines.length), flavorLines.length - 1)
 
@@ -163,7 +163,7 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onCo
                   🤠
                 </motion.div>
                 <p className="text-lg font-black tracking-wide text-white leading-tight">{playerName}</p>
-                <p className="text-xs uppercase tracking-widest" style={{ color: '#f5c842' }}>Você</p>
+                <p className="text-xs uppercase tracking-widest" style={{ color: '#f5c842' }}>You</p>
 
                 <AttrTable attrs={playerAttrs} color="#f5c842" align="left" show={showAttrs} />
               </motion.div>
@@ -256,7 +256,7 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onCo
               transition={{ duration: 0.1, ease: 'linear' }}
             />
           </div>
-          <p className="text-white/20 text-xs uppercase tracking-widest">Calculando resultado...</p>
+          <p className="text-white/20 text-xs uppercase tracking-widest">Calculating result...</p>
         </div>
       </div>
     </div>

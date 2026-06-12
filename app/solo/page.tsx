@@ -17,12 +17,12 @@ import ResolutionPhase from '@/components/phases/ResolutionPhase'
 type SoloPhase = 'setup' | 'reveal' | 'attributes' | 'actions' | 'intro' | 'resolution'
 
 const SOLO_PHASES: { key: SoloPhase; label: string }[] = [
-  { key: 'setup', label: 'Início' },
+  { key: 'setup', label: 'Start' },
   { key: 'reveal', label: 'Reveal' },
-  { key: 'attributes', label: 'Atributos' },
-  { key: 'actions', label: 'Ações' },
+  { key: 'attributes', label: 'Attributes' },
+  { key: 'actions', label: 'Actions' },
   { key: 'intro', label: 'VS' },
-  { key: 'resolution', label: 'Duelo' },
+  { key: 'resolution', label: 'Duel' },
 ]
 
 function SoloPhaseIndicator({ phase }: { phase: SoloPhase }) {
@@ -138,7 +138,7 @@ function SoloGame() {
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">
-            ← Início
+            ← Home
           </Link>
           <SoloPhaseIndicator phase={phase} />
           <div className="w-12" />
@@ -159,9 +159,9 @@ function SoloGame() {
                   className="text-3xl font-black uppercase tracking-widest"
                   style={{ color: '#f5c842' }}
                 >
-                  vs Computador
+                  vs Computer
                 </h2>
-                <p className="text-white/40 text-sm mt-2">Um oponente aleatório aguarda você</p>
+                <p className="text-white/40 text-sm mt-2">A random opponent awaits you</p>
               </div>
 
               <div
@@ -175,20 +175,20 @@ function SoloGame() {
                 >
                   ❓
                 </motion.div>
-                <p className="text-white/40 text-sm">Oponente desconhecido</p>
-                <p className="text-white/25 text-xs mt-1">Será revelado em breve...</p>
+                <p className="text-white/40 text-sm">Unknown opponent</p>
+                <p className="text-white/25 text-xs mt-1">Will be revealed soon...</p>
               </div>
 
               <div className="w-full max-w-sm">
                 <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">
-                  Seu Apelido
+                  Your Nickname
                 </label>
                 <input
                   type="text"
                   value={nickname}
                   onChange={e => setNickname(e.target.value)}
                   onKeyDown={e => e.key === 'Enter' && startGame()}
-                  placeholder="Ex: Pistoleiro123"
+                  placeholder="e.g. Gunslinger123"
                   maxLength={20}
                   className="text-lg font-bold mb-4"
                 />
@@ -197,7 +197,7 @@ function SoloGame() {
                   disabled={!nickname.trim()}
                   className="btn-gold w-full py-4 text-lg"
                 >
-                  🎲 Sortear Oponente
+                  🎲 Draw Opponent
                 </button>
               </div>
             </motion.div>
@@ -279,7 +279,7 @@ function SoloGame() {
             <p className="text-xs font-black" style={{ color: aiCharacter.color }}>
               {aiCharacter.name}
             </p>
-            <p className="text-xs text-white/40">Oponente</p>
+            <p className="text-xs text-white/40">Opponent</p>
           </div>
         </motion.div>
       )}

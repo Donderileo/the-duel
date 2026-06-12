@@ -16,7 +16,7 @@ export default function Home() {
 
   async function createRoom() {
     if (!nickname.trim()) {
-      setError('Digite seu apelido primeiro!')
+      setError('Enter your nickname first!')
       return
     }
     setLoading(true)
@@ -40,7 +40,7 @@ export default function Home() {
     })
 
     if (dbError) {
-      setError('Erro ao criar sala. Verifique a configuração do Supabase.')
+      setError('Could not create room. Check your Supabase configuration.')
       setLoading(false)
       return
     }
@@ -83,13 +83,13 @@ export default function Home() {
 
         {/* Input */}
         <div className="mb-6">
-          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Seu Apelido</label>
+          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
           <input
             type="text"
             value={nickname}
             onChange={e => setNickname(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && createRoom()}
-            placeholder="Ex: Pistoleiro123"
+            placeholder="e.g. Gunslinger123"
             maxLength={20}
             className="text-lg font-bold"
           />
@@ -111,26 +111,26 @@ export default function Home() {
             disabled={loading}
             className="btn-gold w-full py-4 text-lg"
           >
-            {loading ? 'Criando...' : '⚔️ Criar Sala'}
+            {loading ? 'Creating...' : '⚔️ Create Room'}
           </button>
 
           <div className="relative flex items-center gap-3">
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
-            <span className="text-white/25 text-xs uppercase tracking-widest">ou</span>
+            <span className="text-white/25 text-xs uppercase tracking-widest">or</span>
             <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
           </div>
 
           <Link
             href={nickname.trim() ? `/solo?nick=${encodeURIComponent(nickname.trim())}` : '#'}
-            onClick={e => { if (!nickname.trim()) { e.preventDefault(); setError('Digite seu apelido primeiro!') } }}
+            onClick={e => { if (!nickname.trim()) { e.preventDefault(); setError('Enter your nickname first!') } }}
             className="btn-ghost w-full py-4 text-lg text-center block"
           >
-            🤖 Jogar contra o Computador
+            🤖 Play vs Computer
           </Link>
         </div>
 
         <p className="text-center text-white/30 text-xs mt-6">
-          Crie uma sala e compartilhe o link com seu oponente
+          Create a room and share the link with your opponent
         </p>
       </motion.div>
     </div>

@@ -142,8 +142,8 @@ export default function RoomPage() {
       <div className="min-h-screen flex items-center justify-center" style={{ background: '#0a0a1a' }}>
         <div className="text-center">
           <div className="text-6xl mb-4">💀</div>
-          <p className="text-white text-2xl font-black">Sala não encontrada</p>
-          <Link href="/" className="btn-gold inline-block px-8 py-3 mt-6 text-sm">← Início</Link>
+          <p className="text-white text-2xl font-black">Room not found</p>
+          <Link href="/" className="btn-gold inline-block px-8 py-3 mt-6 text-sm">← Home</Link>
         </div>
       </div>
     )
@@ -162,7 +162,7 @@ export default function RoomPage() {
       <div className="card-3d w-full max-w-lg mx-4 p-8 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">← Início</Link>
+          <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">← Home</Link>
           <div className="flex items-center gap-2">
             <PhaseIndicator phase={room.phase} />
           </div>
@@ -211,10 +211,10 @@ export default function RoomPage() {
 
 function PhaseIndicator({ phase }: { phase: string }) {
   const phases = [
-    { key: 'waiting', label: 'Sala' },
-    { key: 'attributes', label: 'Atributos' },
-    { key: 'actions', label: 'Ações' },
-    { key: 'resolution', label: 'Duelo' },
+    { key: 'waiting', label: 'Room' },
+    { key: 'attributes', label: 'Attributes' },
+    { key: 'actions', label: 'Actions' },
+    { key: 'resolution', label: 'Duel' },
   ]
   const idx = phases.findIndex(p => p.key === phase)
 

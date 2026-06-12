@@ -4,29 +4,29 @@ const TARGET_DAMAGE: Record<Target, number> = {
   head: 100,
   left_shoulder: 50,
   right_shoulder: 50,
-  left_chest: 30,
-  right_chest: 30,
+  left_arm: 20,
+  right_arm: 20,
 }
 
 export const TARGET_LABELS: Record<Target, string> = {
-  head: 'Cabeça',
-  left_shoulder: 'Ombro Esq',
-  right_shoulder: 'Ombro Dir',
-  left_chest: 'Peito Esq',
-  right_chest: 'Peito Dir',
+  head: 'Head',
+  left_shoulder: 'L. Shoulder',
+  right_shoulder: 'R. Shoulder',
+  left_arm: 'L. Arm',
+  right_arm: 'R. Arm',
 }
 
 export const DODGE_LABELS: Record<Dodge, string> = {
-  still: 'Parado',
-  dodge_right: 'Esquiva Dir',
-  dodge_left: 'Esquiva Esq',
-  duck: 'Abaixar',
+  still: 'Still',
+  dodge_right: 'Dodge Right',
+  dodge_left: 'Dodge Left',
+  duck: 'Duck',
 }
 
 const DODGE_PROTECTIONS: Record<Dodge, Target[]> = {
   still: [],
-  dodge_right: ['head', 'left_shoulder'],
-  dodge_left: ['head', 'right_shoulder'],
+  dodge_right: ['head', 'left_shoulder', 'left_arm'],
+  dodge_left: ['head', 'right_shoulder', 'right_arm'],
   duck: ['head', 'left_shoulder', 'right_shoulder'],
 }
 
@@ -108,7 +108,7 @@ export function determineWinner(
   p2Name: string
 ): { winner: string | null; message: string } {
   const last = results[results.length - 1]
-  if (last.hp1After === last.hp2After) return { winner: null, message: 'EMPATE!' }
-  if (last.hp1After > last.hp2After) return { winner: p1Name, message: `${p1Name} VENCEU!` }
-  return { winner: p2Name, message: `${p2Name} VENCEU!` }
+  if (last.hp1After === last.hp2After) return { winner: null, message: 'DRAW!' }
+  if (last.hp1After > last.hp2After) return { winner: p1Name, message: `${p1Name} WON!` }
+  return { winner: p2Name, message: `${p2Name} WON!` }
 }

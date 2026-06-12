@@ -1,6 +1,6 @@
 export type GamePhase = 'waiting' | 'attributes' | 'actions' | 'resolution' | 'finished'
 
-export type Target = 'head' | 'left_shoulder' | 'right_shoulder' | 'left_chest' | 'right_chest'
+export type Target = 'head' | 'left_shoulder' | 'right_shoulder' | 'left_arm' | 'right_arm'
 export type Dodge = 'still' | 'dodge_right' | 'dodge_left' | 'duck'
 
 export interface Attributes {

@@ -28,9 +28,9 @@ export default function AICharacterReveal({ character, onContinue }: AICharacter
   return (
     <div className="flex flex-col items-center gap-8">
       <div className="text-center">
-        <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Seu oponente é...</p>
+        <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Your opponent is...</p>
         <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#e63946' }}>
-          Adversário Sorteado
+          Drawn Opponent
         </h2>
       </div>
 
@@ -84,7 +84,7 @@ export default function AICharacterReveal({ character, onContinue }: AICharacter
             >
               <p className="text-white/60 text-sm italic">&ldquo;{character.description}&rdquo;</p>
               <p className="text-white/25 text-xs mt-4 uppercase tracking-widest">
-                Atributos revelados após a batalha
+                Attributes revealed after the match
               </p>
             </motion.div>
           )}
@@ -100,7 +100,7 @@ export default function AICharacterReveal({ character, onContinue }: AICharacter
             onClick={onContinue}
             className="btn-gold w-full max-w-sm py-4 text-lg"
           >
-            ⚔️ Aceitar Desafio
+            ⚔️ Accept Challenge
           </motion.button>
         )}
       </AnimatePresence>

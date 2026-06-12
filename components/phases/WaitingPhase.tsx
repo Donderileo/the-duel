@@ -25,18 +25,17 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
     <div className="flex flex-col items-center gap-8">
       <div>
         <h2 className="text-3xl font-black text-center uppercase tracking-widest" style={{ color: '#f5c842' }}>
-          Sala de Espera
+          Waiting Room
         </h2>
         <p className="text-white/40 text-center text-sm mt-1">ID: {roomId}</p>
       </div>
 
-      {/* Players status */}
       <div className="flex gap-6 w-full max-w-sm">
         <div className="flex-1 rounded-xl p-4 text-center" style={{ background: 'rgba(45,198,83,0.15)', border: '2px solid rgba(45,198,83,0.4)' }}>
           <div className="text-2xl mb-1">🤠</div>
-          <p className="text-xs text-white/50 uppercase tracking-wider">Você</p>
+          <p className="text-xs text-white/50 uppercase tracking-wider">You</p>
           <p className="font-black text-white truncate">{myNickname}</p>
-          <span className="text-xs" style={{ color: '#2dc653' }}>● Conectado</span>
+          <span className="text-xs" style={{ color: '#2dc653' }}>● Connected</span>
         </div>
 
         <div className="flex items-center text-white/30 font-black text-2xl">VS</div>
@@ -45,9 +44,9 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
           {opponentJoined ? (
             <>
               <div className="text-2xl mb-1">🤠</div>
-              <p className="text-xs text-white/50 uppercase tracking-wider">Oponente</p>
+              <p className="text-xs text-white/50 uppercase tracking-wider">Opponent</p>
               <p className="font-black text-white truncate">{opponentNickname}</p>
-              <span className="text-xs" style={{ color: '#2dc653' }}>● Conectado</span>
+              <span className="text-xs" style={{ color: '#2dc653' }}>● Connected</span>
             </>
           ) : (
             <>
@@ -58,15 +57,14 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
               >
                 ❓
               </motion.div>
-              <p className="text-xs text-white/50 uppercase tracking-wider">Aguardando</p>
+              <p className="text-xs text-white/50 uppercase tracking-wider">Waiting</p>
               <p className="font-black text-white/30">...</p>
-              <span className="text-xs text-white/30">Aguardando...</span>
+              <span className="text-xs text-white/30">Waiting...</span>
             </>
           )}
         </div>
       </div>
 
-      {/* Share link */}
       {isHost && !opponentJoined && (
         <motion.div
           initial={{ opacity: 0, y: 10 }}
@@ -74,7 +72,7 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
           className="w-full max-w-sm"
         >
           <p className="text-white/50 text-xs uppercase tracking-widest text-center mb-3">
-            Compartilhe o link com seu oponente
+            Share this link with your opponent
           </p>
           <div className="flex gap-2">
             <input
@@ -85,7 +83,7 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
               style={{ background: 'rgba(255,255,255,0.05)', border: '2px solid rgba(255,255,255,0.1)' }}
             />
             <button onClick={copyLink} className="btn-gold px-4 py-2 text-sm whitespace-nowrap">
-              {copied ? '✓ Copiado' : '📋 Copiar'}
+              {copied ? '✓ Copied' : '📋 Copy'}
             </button>
           </div>
         </motion.div>
@@ -98,7 +96,7 @@ export default function WaitingPhase({ roomId, isHost, opponentJoined, myNicknam
           className="text-lg font-black uppercase tracking-widest"
           style={{ color: '#f5c842' }}
         >
-          Iniciando duelo...
+          Starting duel...
         </motion.p>
       )}
     </div>

@@ -8,10 +8,10 @@ import { TARGET_LABELS, determineWinner } from '@/lib/gameLogic'
 import HPBar from '@/components/HPBar'
 
 const ATTR_LABELS = {
-  precision: '🎯 Precisão',
-  damage: '💥 Dano',
-  reflexes: '⚡ Reflexos',
-  resistance: '🛡️ Resistência',
+  precision: '🎯 Precision',
+  damage: '💥 Damage',
+  reflexes: '⚡ Reflexes',
+  resistance: '🛡️ Resistance',
 } as const
 
 interface ResolutionPhaseProps {
@@ -58,7 +58,7 @@ export default function ResolutionPhase({
     <div className="flex flex-col items-center gap-6 w-full">
       <div className="text-center">
         <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#e63946' }}>
-          O Duelo
+          The Duel
         </h2>
       </div>
 
@@ -109,7 +109,7 @@ export default function ResolutionPhase({
             transition={{ duration: 1.2, repeat: Infinity }}
             className="text-center text-white/40 text-sm py-4"
           >
-            {visibleRound === 0 ? 'Iniciando duelo...' : `Round ${visibleRound + 1} chegando...`}
+            {visibleRound === 0 ? 'Starting duel...' : `Round ${visibleRound + 1} incoming...`}
           </motion.div>
         )}
       </div>
@@ -142,7 +142,7 @@ export default function ResolutionPhase({
                   onClick={() => setShowAiAttrs(v => !v)}
                   className="btn-ghost w-full py-3 text-sm mb-2"
                 >
-                  {showAiAttrs ? '▲ Ocultar' : '👁 Ver atributos de'} {aiCharacter.name}
+                  {showAiAttrs ? '▲ Hide' : '👁 View attributes of'} {aiCharacter.name}
                 </button>
 
                 <AnimatePresence>
@@ -229,19 +229,19 @@ function ShotLine({
   return (
     <p className="text-sm text-white/70 leading-relaxed">
       <span className="font-bold text-white">{shooterName}</span>
-      {' atirou na '}
+      {' shot at '}
       <span style={{ color: '#f5c842' }}>{TARGET_LABELS[shot.target]}</span>
       {' — '}
       {shot.hit ? (
         <>
           <span style={{ color: '#e63946' }} className="font-bold">
-            Acertou
+            Hit
           </span>
-          {shot.wasProtected && <span className="text-white/40"> (raspão)</span>}
+          {shot.wasProtected && <span className="text-white/40"> (glancing)</span>}
           <span className="font-bold text-white"> -{shot.damage} HP</span>
         </>
       ) : (
-        <span className="text-white/40">Errou</span>
+        <span className="text-white/40">Missed</span>
       )}
     </p>
   )

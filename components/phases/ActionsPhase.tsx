@@ -11,40 +11,38 @@ interface ActionsPhaseProps {
   myReady: boolean
 }
 
-// Damage base values
 const TARGET_DMG: Record<Target, number> = {
   head: 100,
   left_shoulder: 50,
   right_shoulder: 50,
-  left_chest: 30,
-  right_chest: 30,
+  left_arm: 20,
+  right_arm: 20,
 }
 
-// Zones protected by each dodge
 const DODGE_PROTECTS: Record<Dodge, Target[]> = {
   still: [],
-  dodge_right: ['head', 'left_shoulder'],
-  dodge_left: ['head', 'right_shoulder'],
+  dodge_right: ['head', 'left_shoulder', 'left_arm'],
+  dodge_left: ['head', 'right_shoulder', 'right_arm'],
   duck: ['head', 'left_shoulder', 'right_shoulder'],
 }
 
 const BLOCK_LABELS = ['A', 'B', 'C', 'D']
-const BLOCK_ROUNDS = ['Rounds 1 e 5', 'Rounds 2 e 6', 'Rounds 3 e 7', 'Rounds 4 e 8']
+const BLOCK_ROUNDS = ['Rounds 1 & 5', 'Rounds 2 & 6', 'Rounds 3 & 7', 'Rounds 4 & 8']
 const DODGES: Dodge[] = ['still', 'dodge_right', 'dodge_left', 'duck']
 
 const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string }> = {
-  still:       { icon: '🧱', desc: '+3 Resistência', color: '#64748b' },
-  dodge_right: { icon: '↗️', desc: 'Cobre cabeça + ombro esq', color: '#a78bfa' },
-  dodge_left:  { icon: '↖️', desc: 'Cobre cabeça + ombro dir', color: '#a78bfa' },
-  duck:        { icon: '⬇️', desc: 'Cobre cabeça + ambos ombros', color: '#2dc653' },
+  still:       { icon: '🧱', desc: '+3 Resistance', color: '#64748b' },
+  dodge_right: { icon: '↗️', desc: 'Covers head + left shoulder + left arm', color: '#a78bfa' },
+  dodge_left:  { icon: '↖️', desc: 'Covers head + right shoulder + right arm', color: '#a78bfa' },
+  duck:        { icon: '⬇️', desc: 'Covers head + both shoulders', color: '#2dc653' },
 }
 
 const TARGET_COLOR: Record<Target, string> = {
   head:           '#e63946',
   left_shoulder:  '#f97316',
   right_shoulder: '#f97316',
-  left_chest:     '#f5c842',
-  right_chest:    '#f5c842',
+  left_arm:       '#f5c842',
+  right_arm:      '#f5c842',
 }
 
 function defaultBlock(): ActionBlock {
@@ -99,33 +97,21 @@ function BodyMap({ selected, onSelect, dodge, disabled }: BodyMapProps) {
   }
 
   return (
-    <div className="relative mx-auto" style={{ width: 220, height: 260 }}>
-      {/* Silhouette */}
-      <div className="absolute inset-0 flex flex-col items-center justify-start pt-2 pointer-events-none select-none">
-        {/* Head circle */}
-        <div className="w-12 h-12 rounded-full flex items-center justify-center text-3xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
-          🤠
-        </div>
-        {/* Neck */}
-        <div className="w-3 h-3" style={{ background: 'rgba(255,255,255,0.06)' }} />
-        {/* Torso */}
-        <div className="w-20 h-28 rounded-b-xl"
-          style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
-      </div>
-
-      {/* Clickable zones */}
-      {zone('head',           'Cabeça',    { top: 2,   left: '50%', transform: 'translateX(-50%)', width: 72, height: 50 })}
-      {zone('left_shoulder',  'Ombro E',   { top: 60,  left: 8,                                     width: 60, height: 44 })}
-      {zone('right_shoulder', 'Ombro D',   { top: 60,  right: 8,                                    width: 60, height: 44 })}
-      {zone('left_chest',     'Peito E',   { top: 112, left: '50%', transform: 'translateX(-8px) translateX(-50%)', width: 72, height: 44 })}
-      {zone('right_chest',    'Peito D',   { top: 112, right: '50%', transform: 'translateX(8px) translateX(50%)',  width: 72, height: 44 })}
+    <div className="relative mx-auto" style={{ width: 260, height: 200 }}>
+      {/* Head — center top */}
+      {zone('head', 'Head', { top: 0, left: '50%', transform: 'translateX(-50%)', width: 72, height: 50 })}
+      {/* Shoulders — / \ shape flanking center */}
+      {zone('left_shoulder',  'L. Shoulder', { top: 58, left: 20,  width: 68, height: 44 })}
+      {zone('right_shoulder', 'R. Shoulder', { top: 58, right: 20, width: 68, height: 44 })}
+      {/* Arms — wider outward, lower */}
+      {zone('left_arm',  'L. Arm', { top: 110, left: 4,  width: 60, height: 40 })}
+      {zone('right_arm', 'R. Arm', { top: 110, right: 4, width: 60, height: 40 })}
 
       {/* Damage legend */}
       <div className="absolute bottom-0 left-0 right-0 flex justify-center gap-3 text-xs text-white/30">
-        <span style={{ color: '#e63946' }}>● Alto</span>
-        <span style={{ color: '#f97316' }}>● Médio</span>
-        <span style={{ color: '#f5c842' }}>● Baixo</span>
+        <span style={{ color: '#e63946' }}>● High</span>
+        <span style={{ color: '#f97316' }}>● Mid</span>
+        <span style={{ color: '#f5c842' }}>● Low</span>
       </div>
     </div>
   )
@@ -230,15 +216,16 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
   }
 
   const cur = actions[active]
+  const isLast = active === 3
 
   return (
     <div className="flex flex-col items-center gap-5">
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>
-          Planejar Ações
+          Plan Actions
         </h2>
-        <p className="text-white/40 text-xs mt-1">Configure os 4 blocos · cada um vale 2 rounds</p>
+        <p className="text-white/40 text-xs mt-1">Set up 4 blocks · each covers 2 rounds</p>
       </div>
 
       {/* Block selector summary */}
@@ -246,7 +233,7 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
         {actions.map((a, i) => (
           <BlockMiniCard
             key={i}
-            label={`Bloco ${BLOCK_LABELS[i]}`}
+            label={`Block ${BLOCK_LABELS[i]}`}
             action={a}
             active={i === active}
             onClick={() => setActive(i)}
@@ -272,7 +259,7 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
           <div className="w-full flex gap-4 items-start">
             {/* Left: body map */}
             <div className="flex flex-col items-center gap-2 flex-shrink-0">
-              <p className="text-xs font-black uppercase tracking-wider text-white/50">🎯 Onde atirar</p>
+              <p className="text-xs font-black uppercase tracking-wider text-white/50">🎯 Where to shoot</p>
               <BodyMap
                 selected={cur.target}
                 onSelect={setTarget}
@@ -283,50 +270,54 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
 
             {/* Right: dodge */}
             <div className="flex-1 flex flex-col gap-2 pt-6">
-              <p className="text-xs font-black uppercase tracking-wider text-white/50">🛡️ Como desviar</p>
+              <p className="text-xs font-black uppercase tracking-wider text-white/50">🛡️ How to dodge</p>
               <DodgePicker
                 selected={cur.dodge}
                 onSelect={setDodge}
                 disabled={myReady}
               />
-              {/* Selection summary pill */}
-              <div className="rounded-xl p-3 mt-1"
-                style={{ background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                <p className="text-xs text-white/40 mb-1">Resumo do bloco</p>
-                <p className="text-xs text-white">
-                  <span style={{ color: TARGET_COLOR[cur.target] }}>⬤</span>
-                  {' '}{TARGET_LABELS[cur.target]}
-                  <span className="text-white/30"> · </span>
-                  {TARGET_DMG[cur.target]} dano base
-                </p>
-                <p className="text-xs text-white mt-0.5">
-                  <span>{DODGE_META[cur.dodge].icon}</span>
-                  {' '}{DODGE_LABELS[cur.dodge]}
-                  <span className="text-white/30"> · </span>
-                  {DODGE_PROTECTS[cur.dodge].length > 0
-                    ? `cobre ${DODGE_PROTECTS[cur.dodge].map(t => TARGET_LABELS[t]).join(', ')}`
-                    : DODGE_META[cur.dodge].desc}
-                </p>
-              </div>
             </div>
           </div>
         </motion.div>
       </AnimatePresence>
 
-      {/* Status + confirm */}
+      {/* Status */}
       <div className="flex gap-4 text-xs w-full justify-center">
         <span style={{ color: myReady ? '#2dc653' : '#f5c842' }}>
-          {myReady ? '✓ Você: Pronto' : 'Configurando...'}
+          {myReady ? '✓ You: Ready' : 'Configuring...'}
         </span>
         <span style={{ color: opponentReady ? '#2dc653' : 'rgba(255,255,255,0.3)' }}>
-          {opponentReady ? '✓ Oponente: Pronto' : '○ Oponente: planejando...'}
+          {opponentReady ? '✓ Opponent: Ready' : '○ Opponent: planning...'}
         </span>
       </div>
 
       {!myReady && (
-        <button onClick={() => onConfirm(actions)} className="btn-red w-full py-4 text-lg">
-          🔫 PRONTO — Iniciar Duelo
-        </button>
+        <div className="flex gap-2 w-full">
+          {active > 0 && (
+            <motion.button
+              onClick={() => setActive(active - 1)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-ghost py-3 px-5 text-sm"
+            >
+              ← Back
+            </motion.button>
+          )}
+          {!isLast ? (
+            <motion.button
+              onClick={() => setActive(active + 1)}
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.97 }}
+              className="btn-gold flex-1 py-3 text-sm"
+            >
+              Next Block →
+            </motion.button>
+          ) : (
+            <button onClick={() => onConfirm(actions)} className="btn-red flex-1 py-4 text-lg">
+              🔫 READY — Start Duel
+            </button>
+          )}
+        </div>
       )}
 
       {myReady && !opponentReady && (
@@ -335,7 +326,7 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
           transition={{ duration: 1.5, repeat: Infinity }}
           className="text-white/50 text-sm"
         >
-          Aguardando oponente...
+          Waiting for opponent...
         </motion.p>
       )}
     </div>

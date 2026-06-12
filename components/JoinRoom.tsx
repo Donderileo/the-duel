@@ -16,7 +16,7 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
   const [error, setError] = useState('')
 
   async function join() {
-    if (!nickname.trim()) { setError('Digite seu apelido!'); return }
+    if (!nickname.trim()) { setError('Enter your nickname!'); return }
     setLoading(true)
     setError('')
     const playerId = uuidv4()
@@ -35,7 +35,7 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
       .is('player2', null)
 
     if (dbError) {
-      setError('Erro ao entrar na sala. Sala cheia ou inválida.')
+      setError('Could not join the room. Room is full or invalid.')
       setLoading(false)
       return
     }
@@ -54,19 +54,19 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
         <div className="text-center mb-8">
           <div className="text-5xl mb-4">⚔️</div>
           <h1 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>
-            Entrar na Sala
+            Join Room
           </h1>
           <p className="text-white/40 text-sm mt-2">ID: {roomId}</p>
         </div>
 
         <div className="mb-6">
-          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Seu Apelido</label>
+          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
           <input
             type="text"
             value={nickname}
             onChange={e => setNickname(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && join()}
-            placeholder="Ex: Bandoleiro99"
+            placeholder="e.g. Outlaw99"
             maxLength={20}
             className="text-lg font-bold"
           />
@@ -75,7 +75,7 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
         {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}
 
         <button onClick={join} disabled={loading} className="btn-gold w-full py-4 text-lg">
-          {loading ? 'Entrando...' : '🔫 Entrar no Duelo'}
+          {loading ? 'Joining...' : '🔫 Enter the Duel'}
         </button>
       </motion.div>
     </div>
