@@ -50,9 +50,10 @@ function calcDamage(
   baseDamage: number,
   shooterDamage: number,
   targetResistance: number,
-  isFullyProtected: boolean
+  isFullyProtected: boolean,
+  isPartiallyProtected: boolean
 ): number {
-  const base = isFullyProtected ? baseDamage * 0.5 : baseDamage
+  const base = isFullyProtected ? baseDamage * 0.5 : isPartiallyProtected ? baseDamage * 0.85 : baseDamage
   return base * (1 + Math.pow(shooterDamage, 1.5) * 0.06) * (1 - targetResistance * 0.08)
 }
 
@@ -87,14 +88,14 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
 
     const p1BaseChance = calcHitChance(p1EffPrecision, p2Attrs.reflexes)
     const p1HitChance = p2FullProtected    ? Math.max(10, p1BaseChance - 20)
-                      : p2PartialProtected ? Math.max(10, p1BaseChance - 10)
+                      : p2PartialProtected ? Math.max(10, p1BaseChance - 15)
                       : p1BaseChance
     const p1Hit = Math.random() * 100 < p1HitChance
 
     let p1Damage = 0
     let p1CausedDebuff = false
     if (p1Hit) {
-      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2Attrs.resistance, p2FullProtected)
+      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2Attrs.resistance, p2FullProtected, p2PartialProtected)
       hp2 = Math.max(0, hp2 - p1Damage)
       if (ARM_TARGETS.includes(a1.target)) {
         p2PrecisionPenalty += 1
@@ -111,14 +112,14 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
 
     const p2BaseChance = calcHitChance(p2EffPrecision, p1Attrs.reflexes)
     const p2HitChance = p1FullProtected    ? Math.max(10, p2BaseChance - 20)
-                      : p1PartialProtected ? Math.max(10, p2BaseChance - 10)
+                      : p1PartialProtected ? Math.max(10, p2BaseChance - 15)
                       : p2BaseChance
     const p2Hit = Math.random() * 100 < p2HitChance
 
     let p2Damage = 0
     let p2CausedDebuff = false
     if (p2Hit) {
-      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1Attrs.resistance, p1FullProtected)
+      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1Attrs.resistance, p1FullProtected, p1PartialProtected)
       hp1 = Math.max(0, hp1 - p2Damage)
       if (ARM_TARGETS.includes(a2.target)) {
         p1PrecisionPenalty += 1

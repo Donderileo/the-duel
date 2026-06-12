@@ -49,8 +49,8 @@ const DODGES: Dodge[] = ['still', 'dodge_right', 'dodge_left', 'duck']
 
 const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string }> = {
   still:       { icon: '🎯', desc: '+3 Precision', color: '#64748b' },
-  dodge_right: { icon: '↗️', desc: 'Full: L.Shoulder + L.Arm · ½ Head', color: '#a78bfa' },
-  dodge_left:  { icon: '↖️', desc: 'Full: R.Shoulder + R.Arm · ½ Head', color: '#a78bfa' },
+  dodge_right: { icon: '↗️', desc: 'Full: L.Shoulder + L.Arm · Head: −15 acc −15% dmg', color: '#a78bfa' },
+  dodge_left:  { icon: '↖️', desc: 'Full: R.Shoulder + R.Arm · Head: −15 acc −15% dmg', color: '#a78bfa' },
   duck:        { icon: '⬇️', desc: 'Full: Head + Shoulders · Cannot aim head', color: '#2dc653' },
 }
 

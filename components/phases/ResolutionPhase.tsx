@@ -243,7 +243,7 @@ function ShotLine({
         <>
           <span style={{ color: '#e63946' }} className="font-bold">Hit</span>
           {shot.wasProtected && <span className="text-white/40"> (glancing)</span>}
-          {shot.wasPartial && <span className="text-white/40"> (partial cover)</span>}
+          {shot.wasPartial && <span className="text-white/40"> (grazed −15%)</span>}
           <span className="font-bold text-white"> -{shot.damage} HP</span>
           {shot.causedArmDebuff && (
             <span style={{ color: '#a78bfa' }}> 🎯−1 aim</span>
