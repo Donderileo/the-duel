@@ -14,7 +14,6 @@ import {
   CAMPAIGN_ORDER,
   CAMPAIGN_AI_BUDGETS,
   type CampaignState,
-  type CampaignDifficulty,
 } from '@/lib/campaign'
 import { generateAIActions } from '@/lib/aiCharacters'
 import { simulateGame, determineWinner } from '@/lib/gameLogic'
@@ -34,20 +33,20 @@ type CampaignPhase =
   | 'setup'
   | 'map'
   | 'reveal'
-  | 'attributes'
-  | 'actions'
+  | 'attributes'   // only on first fight (no saved attrs yet)
+  | 'actions'      // only on first fight or "Change Plan"
   | 'intro'
   | 'resolution'
-  | 'bonus'
+  | 'bonus'        // after each win: distribute 2 new pts
   | 'victory'
   | 'defeated'
 
 const PHASE_LABELS: { key: CampaignPhase; label: string }[] = [
-  { key: 'reveal', label: 'Reveal' },
+  { key: 'reveal',     label: 'Reveal'     },
   { key: 'attributes', label: 'Attributes' },
-  { key: 'actions', label: 'Planning' },
-  { key: 'intro', label: 'VS' },
-  { key: 'resolution', label: 'Duel' },
+  { key: 'actions',    label: 'Planning'   },
+  { key: 'intro',      label: 'VS'         },
+  { key: 'resolution', label: 'Duel'       },
 ]
 
 function CampaignPhaseIndicator({ phase, levelIndex }: { phase: CampaignPhase; levelIndex: number }) {
@@ -81,13 +80,11 @@ export default function CampaignPage() {
   const [phase, setPhase] = useState<CampaignPhase>('loading')
   const [campaignState, setCampaignState] = useState<CampaignState | null>(null)
   const [nickname, setNickname] = useState('')
-  const [difficulty, setDifficulty] = useState<CampaignDifficulty>('easy')
   const [playerAttrs, setPlayerAttrs] = useState<Attributes | null>(null)
   const [results, setResults] = useState<RoundResult[] | null>(null)
   const [planningFromMap, setPlanningFromMap] = useState(false)
   const hasLoaded = useRef(false)
 
-  // Load saved campaign state on mount
   useEffect(() => {
     if (hasLoaded.current) return
     hasLoaded.current = true
@@ -95,11 +92,7 @@ export default function CampaignPage() {
       if (saved) {
         setCampaignState(saved)
         setPlayerAttrs(saved.playerAttrs)
-        if (saved.campaignComplete) {
-          setPhase('victory')
-        } else {
-          setPhase('map')
-        }
+        setPhase(saved.campaignComplete ? 'victory' : 'map')
       } else {
         setPhase('setup')
       }
@@ -108,7 +101,7 @@ export default function CampaignPage() {
 
   function handleStartCampaign() {
     if (!nickname.trim()) return
-    const state = createFreshCampaignState(nickname.trim(), difficulty)
+    const state = createFreshCampaignState(nickname.trim())
     saveCampaignState(state).then(() => {
       setCampaignState(state)
       setPlayerAttrs(null)
@@ -116,27 +109,20 @@ export default function CampaignPage() {
     })
   }
 
-  function handleFight() {
-    setPhase('reveal')
-  }
-
-  function handleChangePlan() {
-    setPlanningFromMap(true)
-    setPhase('actions')
-  }
+  function handleFight() { setPhase('reveal') }
 
   function handleRevealContinue() {
-    setPhase('attributes')
+    // First fight: need to set attributes. Subsequent: skip to actions or straight to fight
+    if (!campaignState) return
+    const hasAttrs = campaignState.playerBonusPoints > 0 ||
+      (campaignState.playerAttrs.precision + campaignState.playerAttrs.damage +
+       campaignState.playerAttrs.reflexes + campaignState.playerAttrs.resistance) > 0
+    setPhase(hasAttrs ? 'actions' : 'attributes')
   }
 
   function handleAttributesConfirm(attrs: Attributes) {
     setPlayerAttrs(attrs)
-    // Skip planning if already saved — reuse existing plan
-    if (campaignState?.playerActions) {
-      runSimulation(attrs, campaignState.playerActions)
-    } else {
-      setPhase('actions')
-    }
+    setPhase('actions')
   }
 
   function runSimulation(attrs: Attributes, actions: ActionBlock[]) {
@@ -169,17 +155,14 @@ export default function CampaignPage() {
 
   async function handleActionsConfirm(actions: ActionBlock[]) {
     if (!campaignState) return
-    // Save plan to campaign state
     const newState = { ...campaignState, playerActions: actions }
     await saveCampaignState(newState)
     setCampaignState(newState)
 
     if (planningFromMap) {
-      // Just updating the plan — go back to map
       setPlanningFromMap(false)
       setPhase('map')
     } else {
-      // Coming from a fight flow — run simulation
       if (!playerAttrs) return
       runSimulation(playerAttrs, actions)
     }
@@ -209,27 +192,10 @@ export default function CampaignPage() {
       }
       await saveCampaignState(newState)
       setCampaignState(newState)
-
-      if (campaignComplete) {
-        setPhase('victory')
-      } else if (campaignState.difficulty === 'hard') {
-        setPhase('bonus')
-      } else {
-        // Easy: open full AttributesPhase pre-filled with current build + new budget
-        setPhase('attributes')
-      }
+      setPhase(campaignComplete ? 'victory' : 'bonus')
     } else {
-      // Loss
-      if (campaignState.difficulty === 'easy') {
-        const newBonusPoints = Math.max(0, campaignState.playerBonusPoints - 1)
-        const newState = { ...campaignState, playerBonusPoints: newBonusPoints }
-        await saveCampaignState(newState)
-        setCampaignState(newState)
-        setPhase('reveal')
-      } else {
-        // Hard: game over
-        setPhase('defeated')
-      }
+      // Loss: campaign over
+      setPhase('defeated')
     }
   }
 
@@ -240,6 +206,11 @@ export default function CampaignPage() {
     setCampaignState(newState)
     setPlayerAttrs(newAttrs)
     setPhase('map')
+  }
+
+  function handleChangePlan() {
+    setPlanningFromMap(true)
+    setPhase('actions')
   }
 
   async function handleReset() {
@@ -271,7 +242,6 @@ export default function CampaignPage() {
       className="min-h-screen flex items-center justify-center relative"
       style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}
     >
-      {/* Battle intro overlay */}
       <AnimatePresence>
         {phase === 'intro' && campaignState && playerAttrs && currentChar && (
           <BattleIntro
@@ -285,16 +255,12 @@ export default function CampaignPage() {
 
       <StarBackground count={50} />
 
-      <div className="card-3d w-full max-w-lg mx-4 p-8 relative z-10">
-        {/* Header */}
+      <div className="card-3d w-full max-w-lg sm:max-w-xl mx-4 p-6 sm:p-8 relative z-10">
         <div className="flex items-center justify-between mb-8">
-          <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">
-            ← Home
-          </Link>
-          {showPhaseIndicator && campaignState && (
+          <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">← Home</Link>
+          {showPhaseIndicator && campaignState ? (
             <CampaignPhaseIndicator phase={phase} levelIndex={campaignState.currentLevelIndex} />
-          )}
-          {!showPhaseIndicator && (
+          ) : (
             <span className="text-white/30 text-xs uppercase tracking-widest font-bold">Campaign</span>
           )}
           <div className="w-12" />
@@ -303,21 +269,20 @@ export default function CampaignPage() {
         <AnimatePresence mode="wait">
           {/* SETUP */}
           {phase === 'setup' && (
-            <motion.div
-              key="setup"
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              exit={{ opacity: 0, y: -20 }}
-              className="flex flex-col items-center gap-8"
-            >
+            <motion.div key="setup" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0, y: -20 }}
+              className="flex flex-col items-center gap-8">
               <div className="text-center">
                 <div className="text-5xl mb-4">🏆</div>
-                <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>
-                  Campaign
-                </h2>
+                <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>Campaign</h2>
                 <p className="text-white/40 text-sm mt-2">Defeat all 8 gunslingers to win</p>
               </div>
-
+              <div
+                className="w-full max-w-sm rounded-xl p-4 text-sm text-white/40"
+                style={{ background: 'rgba(230,57,70,0.08)', border: '1px solid rgba(230,57,70,0.2)' }}
+              >
+                💀 <strong className="text-white/60">Hard rules:</strong> lose once and the campaign ends.
+                Win each fight to earn +2 attribute points for the next opponent.
+              </div>
               <div className="w-full max-w-sm flex flex-col gap-4">
                 <div>
                   <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
@@ -331,45 +296,7 @@ export default function CampaignPage() {
                     className="text-lg font-bold"
                   />
                 </div>
-
-                <div>
-                  <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Difficulty</label>
-                  <div className="grid grid-cols-2 gap-3">
-                    {(['easy', 'hard'] as CampaignDifficulty[]).map(d => (
-                      <button
-                        key={d}
-                        onClick={() => setDifficulty(d)}
-                        className="rounded-xl py-4 font-black uppercase tracking-widest text-sm transition-all"
-                        style={{
-                          background: difficulty === d
-                            ? d === 'hard' ? 'rgba(230,57,70,0.2)' : 'rgba(45,198,83,0.2)'
-                            : 'rgba(255,255,255,0.04)',
-                          border: `2px solid ${difficulty === d
-                            ? d === 'hard' ? '#e63946' : '#2dc653'
-                            : 'rgba(255,255,255,0.08)'}`,
-                          color: difficulty === d
-                            ? d === 'hard' ? '#e63946' : '#2dc653'
-                            : 'rgba(255,255,255,0.4)',
-                        }}
-                      >
-                        {d === 'easy' ? '🌿 Easy' : '💀 Hard'}
-                      </button>
-                    ))}
-                  </div>
-                  <div className="mt-2 rounded-lg px-3 py-2" style={{ background: 'rgba(255,255,255,0.03)' }}>
-                    {difficulty === 'easy' ? (
-                      <p className="text-white/40 text-xs">After each win, freely reallocate your full build + 2 new points. Loss costs 1 bonus point.</p>
-                    ) : (
-                      <p className="text-white/40 text-xs">After each win, distribute only the 2 new points. Lose once — campaign over.</p>
-                    )}
-                  </div>
-                </div>
-
-                <button
-                  onClick={handleStartCampaign}
-                  disabled={!nickname.trim()}
-                  className="btn-gold w-full py-4 text-lg"
-                >
+                <button onClick={handleStartCampaign} disabled={!nickname.trim()} className="btn-gold w-full py-4 text-lg">
                   ⚔️ Begin Campaign
                 </button>
               </div>
@@ -379,12 +306,7 @@ export default function CampaignPage() {
           {/* MAP */}
           {phase === 'map' && campaignState && (
             <motion.div key="map" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-              <CampaignMap
-                campaignState={campaignState}
-                onFight={handleFight}
-                onReset={handleReset}
-                onChangePlan={handleChangePlan}
-              />
+              <CampaignMap campaignState={campaignState} onFight={handleFight} onReset={handleReset} onChangePlan={handleChangePlan} />
             </motion.div>
           )}
 
@@ -395,7 +317,7 @@ export default function CampaignPage() {
             </motion.div>
           )}
 
-          {/* ATTRIBUTES */}
+          {/* ATTRIBUTES — only first fight */}
           {phase === 'attributes' && (
             <motion.div key="attributes" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}>
               <AttributesPhase
@@ -403,19 +325,14 @@ export default function CampaignPage() {
                 myReady={false}
                 opponentReady={true}
                 pointBudget={currentBudget}
-                initialAttrs={playerAttrs ?? undefined}
               />
             </motion.div>
           )}
 
-          {/* ACTIONS */}
+          {/* PLANNING */}
           {phase === 'actions' && (
             <motion.div key="actions" initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} exit={{ opacity: 0, x: -30 }}>
-              <ActionsPhase
-                onConfirm={handleActionsConfirm}
-                myReady={false}
-                opponentReady={true}
-              />
+              <ActionsPhase onConfirm={handleActionsConfirm} myReady={false} opponentReady={true} />
             </motion.div>
           )}
 
@@ -432,14 +349,10 @@ export default function CampaignPage() {
             </motion.div>
           )}
 
-          {/* BONUS (Hard mode after win) */}
+          {/* BONUS — after win */}
           {phase === 'bonus' && campaignState && playerAttrs && (
             <motion.div key="bonus" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} exit={{ opacity: 0 }}>
-              <BonusPointsModal
-                currentAttrs={playerAttrs}
-                bonusPoints={2}
-                onConfirm={handleBonusConfirm}
-              />
+              <BonusPointsModal currentAttrs={playerAttrs} bonusPoints={2} onConfirm={handleBonusConfirm} />
             </motion.div>
           )}
 
@@ -454,7 +367,7 @@ export default function CampaignPage() {
             </motion.div>
           )}
 
-          {/* DEFEATED (Hard mode loss) */}
+          {/* DEFEATED */}
           {phase === 'defeated' && campaignState && currentChar && (
             <motion.div key="defeated" initial={{ opacity: 0 }} animate={{ opacity: 1 }}>
               <CampaignDefeatedScreen
@@ -468,22 +381,17 @@ export default function CampaignPage() {
         </AnimatePresence>
       </div>
 
-      {/* AI character badge during gameplay */}
-      {showAiBadge && currentChar && (
+      {showAiBadge && currentChar && campaignState && (
         <motion.div
           initial={{ opacity: 0, x: 20 }}
           animate={{ opacity: 1, x: 0 }}
           className="fixed top-6 right-6 rounded-2xl p-3 flex items-center gap-3"
-          style={{
-            background: 'rgba(10,10,26,0.9)',
-            border: `1px solid ${currentChar.color}40`,
-            backdropFilter: 'blur(10px)',
-          }}
+          style={{ background: 'rgba(10,10,26,0.9)', border: `1px solid ${currentChar.color}40`, backdropFilter: 'blur(10px)' }}
         >
           <span className="text-2xl">{currentChar.emoji}</span>
           <div>
             <p className="text-xs font-black" style={{ color: currentChar.color }}>{currentChar.name}</p>
-            <p className="text-xs text-white/40">Level {campaignState!.currentLevelIndex + 1}</p>
+            <p className="text-xs text-white/40">Level {campaignState.currentLevelIndex + 1}</p>
           </div>
         </motion.div>
       )}

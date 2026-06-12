@@ -134,7 +134,7 @@ function SoloGame() {
 
       <StarBackground count={50} />
 
-      <div className="card-3d w-full max-w-lg mx-4 p-8 relative z-10">
+      <div className="card-3d w-full max-w-lg sm:max-w-xl mx-4 p-6 sm:p-8 relative z-10">
         {/* Header */}
         <div className="flex items-center justify-between mb-8">
           <Link href="/" className="text-white/30 text-xs hover:text-white/60 transition-colors">

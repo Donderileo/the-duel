@@ -61,7 +61,7 @@ export default function Home() {
         initial={{ opacity: 0, scale: 0.85, y: 40 }}
         animate={{ opacity: 1, scale: 1, y: 0 }}
         transition={{ duration: 0.6, ease: 'easeOut' }}
-        className="card-3d w-full max-w-md mx-4 p-10 relative z-10"
+        className="card-3d w-full max-w-md sm:max-w-lg mx-4 p-8 sm:p-10 relative z-10"
       >
         {/* Title */}
         <div className="text-center mb-10">

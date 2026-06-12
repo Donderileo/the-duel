@@ -82,7 +82,7 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
     const p2PartialProtected = DODGE_PARTIAL_PROTECTIONS[a2.dodge].includes(a1.target)
 
     // Still: +3 precision; Duck: −3 precision
-    const p1DodgeBonus = a1.dodge === 'still' ? 3 : a1.dodge === 'duck' ? -3 : 0
+    const p1DodgeBonus = a1.dodge === 'still' ? 3 : 0
     const p1EffPrecision = Math.max(0, p1Attrs.precision + p1DodgeBonus - p1PrecisionPenalty)
 
     const p1BaseChance = calcHitChance(p1EffPrecision, p2Attrs.reflexes)
@@ -106,7 +106,7 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
     const p1FullProtected    = DODGE_FULL_PROTECTIONS[a1.dodge].includes(a2.target)
     const p1PartialProtected = DODGE_PARTIAL_PROTECTIONS[a1.dodge].includes(a2.target)
 
-    const p2DodgeBonus = a2.dodge === 'still' ? 3 : a2.dodge === 'duck' ? -3 : 0
+    const p2DodgeBonus = a2.dodge === 'still' ? 3 : 0
     const p2EffPrecision = Math.max(0, p2Attrs.precision + p2DodgeBonus - p2PrecisionPenalty)
 
     const p2BaseChance = calcHitChance(p2EffPrecision, p1Attrs.reflexes)

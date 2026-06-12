@@ -12,7 +12,7 @@ interface CampaignMapProps {
 }
 
 export default function CampaignMap({ campaignState, onFight, onReset, onChangePlan }: CampaignMapProps) {
-  const { currentLevelIndex, levelsCompleted, playerBonusPoints, difficulty, playerNickname, campaignComplete } = campaignState
+  const { currentLevelIndex, levelsCompleted, playerBonusPoints, playerNickname, campaignComplete } = campaignState
   const totalBudget = 10 + playerBonusPoints
 
   return (
@@ -40,8 +40,8 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
         </div>
         <div className="h-8 w-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
         <div className="text-center">
-          <p className="text-sm font-black uppercase" style={{ color: difficulty === 'hard' ? '#e63946' : '#2dc653' }}>
-            {difficulty}
+          <p className="text-sm font-black uppercase" style={{ color: '#e63946' }}>
+            Hard
           </p>
           <p className="text-white/40 text-xs uppercase tracking-widest">Difficulty</p>
         </div>
