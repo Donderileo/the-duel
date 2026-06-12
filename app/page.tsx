@@ -1,65 +1,138 @@
-import Image from "next/image";
+'use client'
+
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import { motion } from 'framer-motion'
+import Link from 'next/link'
+import { supabase } from '@/lib/supabase'
+import { v4 as uuidv4 } from 'uuid'
+import StarBackground from '@/components/StarBackground'
 
 export default function Home() {
+  const [nickname, setNickname] = useState('')
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState('')
+  const router = useRouter()
+
+  async function createRoom() {
+    if (!nickname.trim()) {
+      setError('Digite seu apelido primeiro!')
+      return
+    }
+    setLoading(true)
+    setError('')
+    const roomId = uuidv4().slice(0, 8)
+    const playerId = uuidv4()
+
+    const player1 = {
+      id: playerId,
+      nickname: nickname.trim(),
+      isHost: true,
+      ready: false,
+    }
+
+    const { error: dbError } = await supabase.from('rooms').insert({
+      id: roomId,
+      phase: 'waiting',
+      player1,
+      player2: null,
+      results: null,
+    })
+
+    if (dbError) {
+      setError('Erro ao criar sala. Verifique a configuração do Supabase.')
+      setLoading(false)
+      return
+    }
+
+    localStorage.setItem(`duel_player_${roomId}`, JSON.stringify({ playerId, slot: 'player1' }))
+    router.push(`/room/${roomId}`)
+  }
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the page.tsx file.
+    <div className="min-h-screen flex items-center justify-center relative overflow-hidden" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}>
+      <StarBackground count={60} />
+
+      {/* Moon */}
+      <div className="absolute top-16 right-20 w-24 h-24 rounded-full opacity-30 pointer-events-none"
+        style={{ background: 'radial-gradient(circle at 35% 35%, #ffe8a0, #f5c842)' }} />
+
+      <motion.div
+        initial={{ opacity: 0, scale: 0.85, y: 40 }}
+        animate={{ opacity: 1, scale: 1, y: 0 }}
+        transition={{ duration: 0.6, ease: 'easeOut' }}
+        className="card-3d w-full max-w-md mx-4 p-10 relative z-10"
+      >
+        {/* Title */}
+        <div className="text-center mb-10">
+          <motion.div
+            animate={{ rotate: [-2, 2, -2] }}
+            transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
+            className="text-6xl mb-4"
+          >
+            🔫
+          </motion.div>
+          <h1 className="text-5xl font-black tracking-widest uppercase" style={{ color: '#f5c842', textShadow: '0 0 30px rgba(245,200,66,0.5), 0 4px 8px rgba(0,0,0,0.8)' }}>
+            PISTOL
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
-          </p>
+          <h1 className="text-5xl font-black tracking-widest uppercase" style={{ color: '#e63946', textShadow: '0 0 30px rgba(230,57,70,0.5), 0 4px 8px rgba(0,0,0,0.8)' }}>
+            DUEL
+          </h1>
+          <p className="text-white/40 text-sm mt-3 tracking-widest uppercase">Multiplayer · Turn-based</p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={16}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Input */}
+        <div className="mb-6">
+          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Seu Apelido</label>
+          <input
+            type="text"
+            value={nickname}
+            onChange={e => setNickname(e.target.value)}
+            onKeyDown={e => e.key === 'Enter' && createRoom()}
+            placeholder="Ex: Pistoleiro123"
+            maxLength={20}
+            className="text-lg font-bold"
+          />
         </div>
-      </main>
+
+        {error && (
+          <motion.p
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="text-red-400 text-sm text-center mb-4"
+          >
+            {error}
+          </motion.p>
+        )}
+
+        <div className="flex flex-col gap-3">
+          <button
+            onClick={createRoom}
+            disabled={loading}
+            className="btn-gold w-full py-4 text-lg"
+          >
+            {loading ? 'Criando...' : '⚔️ Criar Sala'}
+          </button>
+
+          <div className="relative flex items-center gap-3">
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+            <span className="text-white/25 text-xs uppercase tracking-widest">ou</span>
+            <div className="flex-1 h-px" style={{ background: 'rgba(255,255,255,0.08)' }} />
+          </div>
+
+          <Link
+            href={nickname.trim() ? `/solo?nick=${encodeURIComponent(nickname.trim())}` : '#'}
+            onClick={e => { if (!nickname.trim()) { e.preventDefault(); setError('Digite seu apelido primeiro!') } }}
+            className="btn-ghost w-full py-4 text-lg text-center block"
+          >
+            🤖 Jogar contra o Computador
+          </Link>
+        </div>
+
+        <p className="text-center text-white/30 text-xs mt-6">
+          Crie uma sala e compartilhe o link com seu oponente
+        </p>
+      </motion.div>
     </div>
-  );
+  )
 }
