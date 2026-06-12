@@ -23,12 +23,23 @@ export const DODGE_LABELS: Record<Dodge, string> = {
   duck: 'Duck',
 }
 
-const DODGE_PROTECTIONS: Record<Dodge, Target[]> = {
-  still: [],
-  dodge_right: ['head', 'left_shoulder', 'left_arm'],
-  dodge_left: ['head', 'right_shoulder', 'right_arm'],
-  duck: ['head', 'left_shoulder', 'right_shoulder'],
+// Full protection: −20 hit chance + ×0.5 damage
+const DODGE_FULL_PROTECTIONS: Record<Dodge, Target[]> = {
+  still:       [],
+  dodge_right: ['left_shoulder', 'left_arm'],
+  dodge_left:  ['right_shoulder', 'right_arm'],
+  duck:        ['head', 'left_shoulder', 'right_shoulder'],
 }
+
+// Partial protection: −10 hit chance only (no damage reduction)
+const DODGE_PARTIAL_PROTECTIONS: Record<Dodge, Target[]> = {
+  still:       [],
+  dodge_right: ['head'],
+  dodge_left:  ['head'],
+  duck:        [],
+}
+
+const ARM_TARGETS: Target[] = ['left_arm', 'right_arm']
 
 function calcHitChance(shooterPrecision: number, targetReflexes: number): number {
   const chance = 50 + shooterPrecision * 5 - targetReflexes * 5
@@ -39,10 +50,9 @@ function calcDamage(
   baseDamage: number,
   shooterDamage: number,
   targetResistance: number,
-  isProtected: boolean
+  isFullyProtected: boolean
 ): number {
-  let base = baseDamage
-  if (isProtected) base *= 0.5
+  const base = isFullyProtected ? baseDamage * 0.5 : baseDamage
   return base * (1 + Math.pow(shooterDamage, 1.5) * 0.06) * (1 - targetResistance * 0.08)
 }
 
@@ -58,40 +68,82 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
 
   let hp1 = 200
   let hp2 = 200
+  // Precision debuffs from arm hits — accumulate permanently
+  let p1PrecisionPenalty = 0
+  let p2PrecisionPenalty = 0
   const results: RoundResult[] = []
 
   for (let round = 1; round <= 8; round++) {
     const a1 = actionForRound(p1Actions, round)
     const a2 = actionForRound(p2Actions, round)
 
-    // p1 shoots p2
-    const p2Protected = DODGE_PROTECTIONS[a2.dodge].includes(a1.target)
-    const p1EffPrecision = p1Attrs.precision + (a1.dodge === 'still' ? 3 : 0)
+    // — p1 shoots p2 —
+    const p2FullProtected    = DODGE_FULL_PROTECTIONS[a2.dodge].includes(a1.target)
+    const p2PartialProtected = DODGE_PARTIAL_PROTECTIONS[a2.dodge].includes(a1.target)
+
+    // Still: +3 precision; Duck: −3 precision
+    const p1DodgeBonus = a1.dodge === 'still' ? 3 : a1.dodge === 'duck' ? -3 : 0
+    const p1EffPrecision = Math.max(0, p1Attrs.precision + p1DodgeBonus - p1PrecisionPenalty)
+
     const p1BaseChance = calcHitChance(p1EffPrecision, p2Attrs.reflexes)
-    const p1HitChance = p2Protected ? Math.max(10, p1BaseChance - 20) : p1BaseChance
+    const p1HitChance = p2FullProtected    ? Math.max(10, p1BaseChance - 20)
+                      : p2PartialProtected ? Math.max(10, p1BaseChance - 10)
+                      : p1BaseChance
     const p1Hit = Math.random() * 100 < p1HitChance
+
     let p1Damage = 0
+    let p1CausedDebuff = false
     if (p1Hit) {
-      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2Attrs.resistance, p2Protected)
+      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2Attrs.resistance, p2FullProtected)
       hp2 = Math.max(0, hp2 - p1Damage)
+      if (ARM_TARGETS.includes(a1.target)) {
+        p2PrecisionPenalty += 1
+        p1CausedDebuff = true
+      }
     }
 
-    // p2 shoots p1
-    const p1Protected = DODGE_PROTECTIONS[a1.dodge].includes(a2.target)
-    const p2EffPrecision = p2Attrs.precision + (a2.dodge === 'still' ? 3 : 0)
+    // — p2 shoots p1 —
+    const p1FullProtected    = DODGE_FULL_PROTECTIONS[a1.dodge].includes(a2.target)
+    const p1PartialProtected = DODGE_PARTIAL_PROTECTIONS[a1.dodge].includes(a2.target)
+
+    const p2DodgeBonus = a2.dodge === 'still' ? 3 : a2.dodge === 'duck' ? -3 : 0
+    const p2EffPrecision = Math.max(0, p2Attrs.precision + p2DodgeBonus - p2PrecisionPenalty)
+
     const p2BaseChance = calcHitChance(p2EffPrecision, p1Attrs.reflexes)
-    const p2HitChance = p1Protected ? Math.max(10, p2BaseChance - 20) : p2BaseChance
+    const p2HitChance = p1FullProtected    ? Math.max(10, p2BaseChance - 20)
+                      : p1PartialProtected ? Math.max(10, p2BaseChance - 10)
+                      : p2BaseChance
     const p2Hit = Math.random() * 100 < p2HitChance
+
     let p2Damage = 0
+    let p2CausedDebuff = false
     if (p2Hit) {
-      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1Attrs.resistance, p1Protected)
+      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1Attrs.resistance, p1FullProtected)
       hp1 = Math.max(0, hp1 - p2Damage)
+      if (ARM_TARGETS.includes(a2.target)) {
+        p1PrecisionPenalty += 1
+        p2CausedDebuff = true
+      }
     }
 
     results.push({
       round,
-      shot1: { target: a1.target, hit: p1Hit, damage: Math.round(p1Damage), wasProtected: p2Protected },
-      shot2: { target: a2.target, hit: p2Hit, damage: Math.round(p2Damage), wasProtected: p1Protected },
+      shot1: {
+        target: a1.target,
+        hit: p1Hit,
+        damage: Math.round(p1Damage),
+        wasProtected: p2FullProtected,
+        wasPartial: p2PartialProtected,
+        causedArmDebuff: p1CausedDebuff,
+      },
+      shot2: {
+        target: a2.target,
+        hit: p2Hit,
+        damage: Math.round(p2Damage),
+        wasProtected: p1FullProtected,
+        wasPartial: p1PartialProtected,
+        causedArmDebuff: p2CausedDebuff,
+      },
       hp1After: Math.round(hp1),
       hp2After: Math.round(hp2),
     })

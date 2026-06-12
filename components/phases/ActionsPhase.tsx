@@ -19,11 +19,20 @@ const TARGET_DMG: Record<Target, number> = {
   right_arm: 20,
 }
 
+// Full protection zones (shown as solid highlight on body map)
 const DODGE_PROTECTS: Record<Dodge, Target[]> = {
-  still: [],
-  dodge_right: ['head', 'left_shoulder', 'left_arm'],
-  dodge_left: ['head', 'right_shoulder', 'right_arm'],
-  duck: ['head', 'left_shoulder', 'right_shoulder'],
+  still:       [],
+  dodge_right: ['left_shoulder', 'left_arm'],
+  dodge_left:  ['right_shoulder', 'right_arm'],
+  duck:        ['head', 'left_shoulder', 'right_shoulder'],
+}
+
+// Partial protection zones (shown as dimmed highlight)
+const DODGE_PARTIAL: Record<Dodge, Target[]> = {
+  still:       [],
+  dodge_right: ['head'],
+  dodge_left:  ['head'],
+  duck:        [],
 }
 
 const BLOCK_LABELS = ['A', 'B', 'C', 'D']
@@ -31,10 +40,10 @@ const BLOCK_ROUNDS = ['Rounds 1 & 5', 'Rounds 2 & 6', 'Rounds 3 & 7', 'Rounds 4 
 const DODGES: Dodge[] = ['still', 'dodge_right', 'dodge_left', 'duck']
 
 const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string }> = {
-  still:       { icon: '🎯', desc: '+3 Precision', color: '#64748b' },
-  dodge_right: { icon: '↗️', desc: 'Covers head + left shoulder + left arm', color: '#a78bfa' },
-  dodge_left:  { icon: '↖️', desc: 'Covers head + right shoulder + right arm', color: '#a78bfa' },
-  duck:        { icon: '⬇️', desc: 'Covers head + both shoulders', color: '#2dc653' },
+  still:       { icon: '🎯', desc: '+3 Precision on your shot', color: '#64748b' },
+  dodge_right: { icon: '↗️', desc: 'Full: L.Shoulder + L.Arm · Partial: Head (−10 acc, no dmg reduce)', color: '#a78bfa' },
+  dodge_left:  { icon: '↖️', desc: 'Full: R.Shoulder + R.Arm · Partial: Head (−10 acc, no dmg reduce)', color: '#a78bfa' },
+  duck:        { icon: '⬇️', desc: 'Full: Head + both Shoulders · −3 Precision on your shot', color: '#2dc653' },
 }
 
 const TARGET_COLOR: Record<Target, string> = {
@@ -59,11 +68,13 @@ interface BodyMapProps {
 }
 
 function BodyMap({ selected, onSelect, dodge, disabled }: BodyMapProps) {
-  const protected_ = DODGE_PROTECTS[dodge]
+  const fullProtected = DODGE_PROTECTS[dodge]
+  const partialProtected = DODGE_PARTIAL[dodge]
 
   const zone = (target: Target, label: string, style: React.CSSProperties) => {
     const isSelected = selected === target
-    const isProtected = protected_.includes(target)
+    const isFull = fullProtected.includes(target)
+    const isPartial = partialProtected.includes(target)
     const color = TARGET_COLOR[target]
 
     return (
@@ -78,20 +89,21 @@ function BodyMap({ selected, onSelect, dodge, disabled }: BodyMapProps) {
           ...style,
           background: isSelected
             ? `${color}33`
-            : isProtected
+            : isFull
             ? 'rgba(45,198,83,0.10)'
+            : isPartial
+            ? 'rgba(245,200,66,0.07)'
             : 'rgba(255,255,255,0.05)',
-          border: `2px solid ${isSelected ? color : isProtected ? '#2dc653' : 'rgba(255,255,255,0.12)'}`,
-          color: isSelected ? color : isProtected ? '#2dc653' : 'rgba(255,255,255,0.5)',
+          border: `2px solid ${isSelected ? color : isFull ? '#2dc653' : isPartial ? '#f5c84288' : 'rgba(255,255,255,0.12)'}`,
+          color: isSelected ? color : isFull ? '#2dc653' : isPartial ? '#f5c842aa' : 'rgba(255,255,255,0.5)',
           boxShadow: isSelected ? `0 0 16px ${color}55` : 'none',
           transition: 'background 0.15s, border-color 0.15s, box-shadow 0.15s, color 0.15s',
         }}
       >
         <span>{label}</span>
         <span className="text-xs opacity-70 font-normal">{TARGET_DMG[target]}</span>
-        {isProtected && (
-          <span className="absolute -top-1.5 -right-1.5 text-xs leading-none">🛡</span>
-        )}
+        {isFull    && <span className="absolute -top-1.5 -right-1.5 text-xs leading-none">🛡</span>}
+        {isPartial && <span className="absolute -top-1.5 -right-1.5 text-xs leading-none">½</span>}
       </motion.button>
     )
   }

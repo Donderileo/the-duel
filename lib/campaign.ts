@@ -111,6 +111,8 @@ export async function getCampaignState(): Promise<CampaignState | null> {
     const { data, sig } = JSON.parse(raw)
     const expected = await hmac(JSON.stringify(data))
     if (sig !== expected) return null
+    // Validate required fields — rejects states saved before difficulty was introduced
+    if (!data.difficulty || data.version !== 1) return null
     return data as CampaignState
   } catch {
     return null

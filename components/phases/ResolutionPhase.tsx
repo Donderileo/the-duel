@@ -224,7 +224,7 @@ function ShotLine({
   shot,
 }: {
   shooterName: string
-  shot: { target: import('@/types/game').Target; hit: boolean; damage: number; wasProtected: boolean }
+  shot: import('@/types/game').ShotResult
 }) {
   return (
     <p className="text-sm text-white/70 leading-relaxed">
@@ -234,11 +234,13 @@ function ShotLine({
       {' — '}
       {shot.hit ? (
         <>
-          <span style={{ color: '#e63946' }} className="font-bold">
-            Hit
-          </span>
+          <span style={{ color: '#e63946' }} className="font-bold">Hit</span>
           {shot.wasProtected && <span className="text-white/40"> (glancing)</span>}
+          {shot.wasPartial && <span className="text-white/40"> (partial cover)</span>}
           <span className="font-bold text-white"> -{shot.damage} HP</span>
+          {shot.causedArmDebuff && (
+            <span style={{ color: '#a78bfa' }}> 🎯−1 aim</span>
+          )}
         </>
       ) : (
         <span className="text-white/40">Missed</span>

@@ -19,7 +19,9 @@ export interface ShotResult {
   target: Target
   hit: boolean
   damage: number
-  wasProtected: boolean
+  wasProtected: boolean    // full protection (−20 chance, ×0.5 dmg)
+  wasPartial: boolean      // partial protection (−10 chance, no dmg reduction)
+  causedArmDebuff: boolean // hit on arm → −1 precision to target
 }
 
 export interface RoundResult {
