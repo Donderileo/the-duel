@@ -19,6 +19,7 @@ interface ResolutionPhaseProps {
   p1Name: string
   p2Name: string
   onPlayAgain: () => void
+  playAgainLabel?: string
   aiCharacter?: AICharacter // passed for post-match reveal
 }
 
@@ -27,6 +28,7 @@ export default function ResolutionPhase({
   p1Name,
   p2Name,
   onPlayAgain,
+  playAgainLabel,
   aiCharacter,
 }: ResolutionPhaseProps) {
   const [visibleRound, setVisibleRound] = useState(0)
@@ -210,7 +212,7 @@ export default function ResolutionPhase({
             )}
 
             <button onClick={onPlayAgain} className="btn-gold w-full py-4 text-lg">
-              🔄 Play Again
+              {playAgainLabel ?? '🔄 Play Again'}
             </button>
           </motion.div>
         )}

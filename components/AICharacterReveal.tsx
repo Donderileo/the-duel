@@ -8,30 +8,42 @@ import { AI_CHARACTERS } from '@/lib/aiCharacters'
 interface AICharacterRevealProps {
   character: AICharacter
   onContinue: () => void
+  instant?: boolean // skip slot-machine animation (campaign mode)
 }
 
-export default function AICharacterReveal({ character, onContinue }: AICharacterRevealProps) {
-  const [slotStep, setSlotStep] = useState(0)
+export default function AICharacterReveal({ character, onContinue, instant }: AICharacterRevealProps) {
+  const [slotStep, setSlotStep] = useState(instant ? 16 : 0)
   const revealed = slotStep >= 16
 
   useEffect(() => {
-    if (slotStep >= 16) return
+    if (instant || slotStep >= 16) return
     const t = setTimeout(
       () => setSlotStep(s => s + 1),
       slotStep < 10 ? 80 : slotStep < 14 ? 160 : 260,
     )
     return () => clearTimeout(t)
-  }, [slotStep])
+  }, [slotStep, instant])
 
   const displayChar = revealed ? character : AI_CHARACTERS[slotStep % AI_CHARACTERS.length]
 
   return (
     <div className="flex flex-col items-center gap-8">
       <div className="text-center">
-        <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Your opponent is...</p>
-        <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#e63946' }}>
-          Drawn Opponent
-        </h2>
+        {instant ? (
+          <>
+            <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Your next opponent</p>
+            <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#e63946' }}>
+              Face the Challenge
+            </h2>
+          </>
+        ) : (
+          <>
+            <p className="text-white/40 text-xs uppercase tracking-widest mb-2">Your opponent is...</p>
+            <h2 className="text-3xl font-black uppercase tracking-widest" style={{ color: '#e63946' }}>
+              Drawn Opponent
+            </h2>
+          </>
+        )}
       </div>
 
       <motion.div

@@ -313,7 +313,7 @@ export default function CampaignPage() {
           {/* REVEAL */}
           {phase === 'reveal' && currentChar && (
             <motion.div key="reveal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
-              <AICharacterReveal character={currentChar} onContinue={handleRevealContinue} />
+              <AICharacterReveal character={currentChar} onContinue={handleRevealContinue} instant />
             </motion.div>
           )}
 
@@ -344,6 +344,7 @@ export default function CampaignPage() {
                 p1Name={campaignState.playerNickname}
                 p2Name={currentChar.name}
                 onPlayAgain={handleResolutionDone}
+                playAgainLabel={campaignState.currentLevelIndex + 1 < 8 ? '⚔️ Next Opponent' : '🏆 Finish Campaign'}
                 aiCharacter={currentChar}
               />
             </motion.div>

@@ -1,6 +1,7 @@
 'use client'
 
-import { motion } from 'framer-motion'
+import { useState } from 'react'
+import { motion, AnimatePresence } from 'framer-motion'
 import { CAMPAIGN_ORDER, CAMPAIGN_AI_BUDGETS, type CampaignState } from '@/lib/campaign'
 import { AI_CHARACTERS } from '@/lib/aiCharacters'
 
@@ -14,6 +15,7 @@ interface CampaignMapProps {
 export default function CampaignMap({ campaignState, onFight, onReset, onChangePlan }: CampaignMapProps) {
   const { currentLevelIndex, levelsCompleted, playerBonusPoints, playerNickname, campaignComplete } = campaignState
   const totalBudget = 10 + playerBonusPoints
+  const [confirmReset, setConfirmReset] = useState(false)
 
   return (
     <div className="flex flex-col items-center gap-6 w-full">
@@ -103,12 +105,50 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
         </div>
       )}
 
-      <button
-        onClick={onReset}
-        className="btn-ghost w-full max-w-sm py-3 text-sm text-white/40"
-      >
-        ↺ New Campaign
-      </button>
+      <div className="w-full max-w-sm">
+        <AnimatePresence mode="wait">
+          {confirmReset ? (
+            <motion.div
+              key="confirm"
+              initial={{ opacity: 0, y: 6 }}
+              animate={{ opacity: 1, y: 0 }}
+              exit={{ opacity: 0, y: -6 }}
+              className="rounded-xl p-4 flex flex-col gap-3"
+              style={{ background: 'rgba(230,57,70,0.08)', border: '1px solid rgba(230,57,70,0.25)' }}
+            >
+              <p className="text-sm text-white/60 text-center">
+                💀 Abandon campaign? All progress will be lost.
+              </p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setConfirmReset(false)}
+                  className="btn-ghost flex-1 py-2 text-sm"
+                >
+                  Cancel
+                </button>
+                <button
+                  onClick={onReset}
+                  className="flex-1 py-2 text-sm font-black rounded-xl uppercase tracking-widest"
+                  style={{ background: 'rgba(230,57,70,0.15)', border: '1px solid rgba(230,57,70,0.4)', color: '#e63946' }}
+                >
+                  Abandon
+                </button>
+              </div>
+            </motion.div>
+          ) : (
+            <motion.button
+              key="idle"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setConfirmReset(true)}
+              className="w-full py-2 text-xs text-white/25 hover:text-white/45 transition-colors text-center"
+            >
+              ↺ Abandon Campaign
+            </motion.button>
+          )}
+        </AnimatePresence>
+      </div>
     </div>
   )
 }
