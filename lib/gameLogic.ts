@@ -17,7 +17,7 @@ export const TARGET_LABELS: Record<Target, string> = {
 }
 
 export const DODGE_LABELS: Record<Dodge, string> = {
-  still: 'Still',
+  still: 'Still (Aim)',
   dodge_right: 'Dodge Right',
   dodge_left: 'Dodge Left',
   duck: 'Duck',
@@ -66,25 +66,25 @@ export function simulateGame(player1: Player, player2: Player): RoundResult[] {
 
     // p1 shoots p2
     const p2Protected = DODGE_PROTECTIONS[a2.dodge].includes(a1.target)
-    const p1BaseChance = calcHitChance(p1Attrs.precision, p2Attrs.reflexes)
+    const p1EffPrecision = p1Attrs.precision + (a1.dodge === 'still' ? 3 : 0)
+    const p1BaseChance = calcHitChance(p1EffPrecision, p2Attrs.reflexes)
     const p1HitChance = p2Protected ? Math.max(10, p1BaseChance - 20) : p1BaseChance
     const p1Hit = Math.random() * 100 < p1HitChance
     let p1Damage = 0
     if (p1Hit) {
-      const p2EffResistance = p2Attrs.resistance + (a2.dodge === 'still' ? 3 : 0)
-      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2EffResistance, p2Protected)
+      p1Damage = calcDamage(TARGET_DAMAGE[a1.target], p1Attrs.damage, p2Attrs.resistance, p2Protected)
       hp2 = Math.max(0, hp2 - p1Damage)
     }
 
     // p2 shoots p1
     const p1Protected = DODGE_PROTECTIONS[a1.dodge].includes(a2.target)
-    const p2BaseChance = calcHitChance(p2Attrs.precision, p1Attrs.reflexes)
+    const p2EffPrecision = p2Attrs.precision + (a2.dodge === 'still' ? 3 : 0)
+    const p2BaseChance = calcHitChance(p2EffPrecision, p1Attrs.reflexes)
     const p2HitChance = p1Protected ? Math.max(10, p2BaseChance - 20) : p2BaseChance
     const p2Hit = Math.random() * 100 < p2HitChance
     let p2Damage = 0
     if (p2Hit) {
-      const p1EffResistance = p1Attrs.resistance + (a1.dodge === 'still' ? 3 : 0)
-      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1EffResistance, p1Protected)
+      p2Damage = calcDamage(TARGET_DAMAGE[a2.target], p2Attrs.damage, p1Attrs.resistance, p1Protected)
       hp1 = Math.max(0, hp1 - p2Damage)
     }
 

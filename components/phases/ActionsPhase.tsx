@@ -31,7 +31,7 @@ const BLOCK_ROUNDS = ['Rounds 1 & 5', 'Rounds 2 & 6', 'Rounds 3 & 7', 'Rounds 4 
 const DODGES: Dodge[] = ['still', 'dodge_right', 'dodge_left', 'duck']
 
 const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string }> = {
-  still:       { icon: '🧱', desc: '+3 Resistance', color: '#64748b' },
+  still:       { icon: '🎯', desc: '+3 Precision', color: '#64748b' },
   dodge_right: { icon: '↗️', desc: 'Covers head + left shoulder + left arm', color: '#a78bfa' },
   dodge_left:  { icon: '↖️', desc: 'Covers head + right shoulder + right arm', color: '#a78bfa' },
   duck:        { icon: '⬇️', desc: 'Covers head + both shoulders', color: '#2dc653' },
