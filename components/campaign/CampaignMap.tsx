@@ -27,7 +27,7 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
       </div>
 
       {/* Player stats bar */}
-      <div className="w-full max-w-sm rounded-xl px-5 py-3 flex items-center justify-between"
+      <div className="w-full max-w-sm lg:max-w-none rounded-xl px-5 py-3 flex items-center justify-between"
         style={{ background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }}>
         <div className="text-center">
           <p className="text-2xl font-black" style={{ color: '#f5c842' }}>{totalBudget}</p>
@@ -49,8 +49,8 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
         </div>
       </div>
 
-      {/* Level cards */}
-      <div className="w-full max-w-sm flex flex-col gap-2">
+      {/* Level cards — 1 col on mobile, 2 cols on desktop */}
+      <div className="w-full max-w-sm lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-2">
         {CAMPAIGN_ORDER.map((id, i) => {
           const char = AI_CHARACTERS.find(c => c.id === id)!
           const completed = levelsCompleted[i]
@@ -90,7 +90,7 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
       </div>
 
       {!campaignComplete && (
-        <div className="w-full max-w-sm flex flex-col gap-2">
+        <div className="w-full max-w-sm lg:max-w-none flex flex-col gap-2">
           <button onClick={onFight} className="btn-gold w-full py-4 text-lg">
             ⚔️ Fight {AI_CHARACTERS.find(c => c.id === CAMPAIGN_ORDER[currentLevelIndex])?.name}
           </button>
@@ -105,7 +105,7 @@ export default function CampaignMap({ campaignState, onFight, onReset, onChangeP
         </div>
       )}
 
-      <div className="w-full max-w-sm">
+      <div className="w-full max-w-sm lg:max-w-none">
         <AnimatePresence mode="wait">
           {confirmReset ? (
             <motion.div

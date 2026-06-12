@@ -64,14 +64,17 @@ export default function ResolutionPhase({
         </h2>
       </div>
 
+      {/* Desktop: HP bars + log side-by-side; Mobile: stacked */}
+      <div className="w-full flex flex-col lg:flex-row lg:items-start gap-6">
+
       {/* HP Bars */}
-      <div className="w-full max-w-sm flex flex-col gap-3">
+      <div className="w-full max-w-sm mx-auto lg:mx-0 lg:w-56 lg:max-w-none flex flex-col gap-3 lg:flex-shrink-0">
         <HPBar current={hp1} name={p1Name} />
         <HPBar current={hp2} name={p2Name} />
       </div>
 
       {/* Round log — fixed height, auto-scrolls to latest round */}
-      <div className="w-full max-w-sm flex flex-col gap-3 max-h-80 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
+      <div className="w-full max-w-sm mx-auto lg:mx-0 lg:max-w-none flex-1 flex flex-col gap-3 max-h-80 overflow-y-auto" style={{ scrollbarWidth: 'none' }}>
         <AnimatePresence>
           {results.slice(0, visibleRound).map((r) => (
             <motion.div
@@ -116,6 +119,8 @@ export default function ResolutionPhase({
         )}
       </div>
 
+      </div>{/* end lg:flex-row wrapper */}
+
       {/* Winner + post-match reveal */}
       <AnimatePresence>
         {done && (
@@ -123,7 +128,7 @@ export default function ResolutionPhase({
             initial={{ opacity: 0, scale: 0.5 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.6, type: 'spring', bounce: 0.4 }}
-            className="w-full max-w-sm flex flex-col items-center gap-4"
+            className="w-full max-w-sm lg:max-w-none flex flex-col items-center gap-4"
           >
             <div className="text-6xl">{winner ? '🏆' : '🤝'}</div>
             <h3

@@ -308,25 +308,28 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
             Block {BLOCK_LABELS[active]} · {BLOCK_ROUNDS[active]}
           </p>
 
-          {/* Target selection */}
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-white/50 mb-2">🎯 Where to shoot</p>
-            <TargetGrid
-              selected={cur.target}
-              onSelect={setTarget}
-              dodge={cur.dodge}
-              disabled={myReady}
-            />
-          </div>
+          {/* Target + Dodge — stacked on mobile, side-by-side on desktop */}
+          <div className="flex flex-col lg:flex-row gap-4">
+            {/* Target selection */}
+            <div className="flex-1">
+              <p className="text-xs font-black uppercase tracking-wider text-white/50 mb-2">🎯 Where to shoot</p>
+              <TargetGrid
+                selected={cur.target}
+                onSelect={setTarget}
+                dodge={cur.dodge}
+                disabled={myReady}
+              />
+            </div>
 
-          {/* Dodge selection */}
-          <div>
-            <p className="text-xs font-black uppercase tracking-wider text-white/50 mb-2">🛡️ How to dodge</p>
-            <DodgeGrid
-              selected={cur.dodge}
-              onSelect={setDodge}
-              disabled={myReady}
-            />
+            {/* Dodge selection */}
+            <div className="flex-1">
+              <p className="text-xs font-black uppercase tracking-wider text-white/50 mb-2">🛡️ How to dodge</p>
+              <DodgeGrid
+                selected={cur.dodge}
+                onSelect={setDodge}
+                disabled={myReady}
+              />
+            </div>
           </div>
         </motion.div>
       </AnimatePresence>

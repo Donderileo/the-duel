@@ -72,7 +72,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady, poi
       </motion.div>
 
       {/* Attributes */}
-      <div className="w-full max-w-sm flex flex-col gap-4">
+      <div className="w-full max-w-sm lg:max-w-none grid grid-cols-1 lg:grid-cols-2 gap-4">
         {ATTR_KEYS.map((key, i) => (
           <motion.div
             key={key}
@@ -136,7 +136,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady, poi
         <button
           onClick={() => onConfirm(attrs)}
           disabled={used !== MAX_POINTS}
-          className="btn-gold w-full max-w-sm py-4 text-lg"
+          className="btn-gold w-full max-w-sm lg:max-w-none py-4 text-lg"
         >
           {used === MAX_POINTS ? '🎯 Confirm Attributes' : `Use all ${MAX_POINTS} points (${MAX_POINTS - used} remaining)`}
         </button>
