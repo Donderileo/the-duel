@@ -35,6 +35,7 @@ export interface RoundResult {
 export interface Player {
   id: string
   nickname: string
+  emoji?: string
   isHost: boolean
   attributes?: Attributes
   actions?: ActionBlock[]

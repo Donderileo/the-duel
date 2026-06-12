@@ -15,6 +15,7 @@ export interface GenericOpponent {
 
 interface BattleIntroProps {
   playerName: string
+  playerEmoji?: string
   playerAttrs: Attributes
   aiCharacter?: AICharacter
   opponent?: GenericOpponent
@@ -90,7 +91,7 @@ function AttrTable({
   )
 }
 
-export default function BattleIntro({ playerName, playerAttrs, aiCharacter, opponent, onComplete }: BattleIntroProps) {
+export default function BattleIntro({ playerName, playerEmoji, playerAttrs, aiCharacter, opponent, onComplete }: BattleIntroProps) {
   const opp: GenericOpponent = aiCharacter
     ? { name: aiCharacter.name, attributes: aiCharacter.attributes, emoji: aiCharacter.emoji, color: aiCharacter.color, title: aiCharacter.title }
     : opponent ?? { name: 'Opponent', attributes: { precision: 0, damage: 0, reflexes: 0, resistance: 0 } }
@@ -174,7 +175,7 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, oppo
                   className="text-7xl mb-2"
                   style={{ filter: 'drop-shadow(0 0 18px rgba(245,200,66,0.45))' }}
                 >
-                  🤠
+                  {playerEmoji ?? '🤠'}
                 </motion.div>
                 <p className="text-lg font-black tracking-wide text-white leading-tight">{playerName}</p>
                 <p className="text-xs uppercase tracking-widest" style={{ color: '#f5c842' }}>You</p>

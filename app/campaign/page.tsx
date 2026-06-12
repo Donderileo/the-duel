@@ -19,6 +19,7 @@ import { generateAIActions } from '@/lib/aiCharacters'
 import { simulateGame, determineWinner } from '@/lib/gameLogic'
 import type { Attributes, ActionBlock, Player, RoundResult } from '@/types/game'
 import AICharacterReveal from '@/components/AICharacterReveal'
+import EmojiPicker from '@/components/EmojiPicker'
 import BattleIntro from '@/components/BattleIntro'
 import AttributesPhase from '@/components/phases/AttributesPhase'
 import ActionsPhase from '@/components/phases/ActionsPhase'
@@ -80,6 +81,7 @@ export default function CampaignPage() {
   const [phase, setPhase] = useState<CampaignPhase>('loading')
   const [campaignState, setCampaignState] = useState<CampaignState | null>(null)
   const [nickname, setNickname] = useState('')
+  const [playerEmoji, setPlayerEmoji] = useState('🤠')
   const [playerAttrs, setPlayerAttrs] = useState<Attributes | null>(null)
   const [results, setResults] = useState<RoundResult[] | null>(null)
   const [planningFromMap, setPlanningFromMap] = useState(false)
@@ -251,6 +253,7 @@ export default function CampaignPage() {
         {phase === 'intro' && campaignState && playerAttrs && currentChar && (
           <BattleIntro
             playerName={campaignState.playerNickname}
+            playerEmoji={playerEmoji}
             playerAttrs={playerAttrs}
             aiCharacter={{ ...currentChar, attributes: scaleCharacterAttributes(currentChar, CAMPAIGN_AI_BUDGETS[currentChar.id]) }}
             onComplete={() => setPhase('resolution')}
@@ -289,6 +292,7 @@ export default function CampaignPage() {
                 Win each fight to earn +2 attribute points for the next opponent.
               </div>
               <div className="w-full max-w-sm flex flex-col gap-4">
+                <EmojiPicker selected={playerEmoji} onSelect={setPlayerEmoji} />
                 <div>
                   <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
                   <input

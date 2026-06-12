@@ -161,7 +161,7 @@ export default function RoomPage() {
 
   const myAttrs = me.attributes
   const opponentAsGeneric: GenericOpponent | undefined = opponent?.attributes
-    ? { name: opponent.nickname ?? 'Opponent', attributes: opponent.attributes, emoji: '🤠', color: '#e63946' }
+    ? { name: opponent.nickname ?? 'Opponent', attributes: opponent.attributes, emoji: opponent.emoji ?? '🤠', color: '#e63946' }
     : undefined
 
   const showIntro = (room.phase === 'resolution' || room.phase === 'finished') &&

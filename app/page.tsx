@@ -7,9 +7,11 @@ import Link from 'next/link'
 import { supabase } from '@/lib/supabase'
 import { v4 as uuidv4 } from 'uuid'
 import StarBackground from '@/components/StarBackground'
+import EmojiPicker from '@/components/EmojiPicker'
 
 export default function Home() {
   const [nickname, setNickname] = useState('')
+  const [playerEmoji, setPlayerEmoji] = useState('🤠')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -27,6 +29,7 @@ export default function Home() {
     const player1 = {
       id: playerId,
       nickname: nickname.trim(),
+      emoji: playerEmoji,
       isHost: true,
       ready: false,
     }
@@ -82,17 +85,20 @@ export default function Home() {
         </div>
 
         {/* Input */}
-        <div className="mb-6">
-          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
-          <input
-            type="text"
-            value={nickname}
-            onChange={e => setNickname(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && createRoom()}
-            placeholder="e.g. Gunslinger123"
-            maxLength={20}
-            className="text-lg font-bold"
-          />
+        <div className="mb-6 flex flex-col gap-4">
+          <EmojiPicker selected={playerEmoji} onSelect={setPlayerEmoji} />
+          <div>
+            <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={e => setNickname(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && createRoom()}
+              placeholder="e.g. Gunslinger123"
+              maxLength={20}
+              className="text-lg font-bold"
+            />
+          </div>
         </div>
 
         {error && (

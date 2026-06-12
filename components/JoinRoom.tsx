@@ -4,6 +4,7 @@ import { useState } from 'react'
 import { motion } from 'framer-motion'
 import { supabase } from '@/lib/supabase'
 import { v4 as uuidv4 } from 'uuid'
+import EmojiPicker from '@/components/EmojiPicker'
 
 interface JoinRoomProps {
   roomId: string
@@ -12,6 +13,7 @@ interface JoinRoomProps {
 
 export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
   const [nickname, setNickname] = useState('')
+  const [playerEmoji, setPlayerEmoji] = useState('🤠')
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
@@ -24,6 +26,7 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
     const player2 = {
       id: playerId,
       nickname: nickname.trim(),
+      emoji: playerEmoji,
       isHost: false,
       ready: false,
     }
@@ -59,17 +62,20 @@ export default function JoinRoom({ roomId, onJoined }: JoinRoomProps) {
           <p className="text-white/40 text-sm mt-2">ID: {roomId}</p>
         </div>
 
-        <div className="mb-6">
-          <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
-          <input
-            type="text"
-            value={nickname}
-            onChange={e => setNickname(e.target.value)}
-            onKeyDown={e => e.key === 'Enter' && join()}
-            placeholder="e.g. Outlaw99"
-            maxLength={20}
-            className="text-lg font-bold"
-          />
+        <div className="mb-6 flex flex-col gap-4">
+          <EmojiPicker selected={playerEmoji} onSelect={setPlayerEmoji} />
+          <div>
+            <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">Your Nickname</label>
+            <input
+              type="text"
+              value={nickname}
+              onChange={e => setNickname(e.target.value)}
+              onKeyDown={e => e.key === 'Enter' && join()}
+              placeholder="e.g. Outlaw99"
+              maxLength={20}
+              className="text-lg font-bold"
+            />
+          </div>
         </div>
 
         {error && <p className="text-red-400 text-sm text-center mb-4">{error}</p>}

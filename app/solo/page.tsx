@@ -9,6 +9,7 @@ import { pickRandomCharacter, generateAIActions, type AICharacter } from '@/lib/
 import { simulateGame } from '@/lib/gameLogic'
 import type { Attributes, ActionBlock, Player, RoundResult } from '@/types/game'
 import AICharacterReveal from '@/components/AICharacterReveal'
+import EmojiPicker from '@/components/EmojiPicker'
 import BattleIntro from '@/components/BattleIntro'
 import AttributesPhase from '@/components/phases/AttributesPhase'
 import ActionsPhase from '@/components/phases/ActionsPhase'
@@ -54,6 +55,7 @@ function SoloGame() {
   const searchParams = useSearchParams()
   const [phase, setPhase] = useState<SoloPhase>('setup')
   const [nickname, setNickname] = useState(searchParams.get('nick') ?? '')
+  const [playerEmoji, setPlayerEmoji] = useState('🤠')
   const [aiCharacter, setAiCharacter] = useState<AICharacter | null>(null)
   const [playerAttrs, setPlayerAttrs] = useState<Attributes | null>(null)
   const [results, setResults] = useState<RoundResult[] | null>(null)
@@ -125,6 +127,7 @@ function SoloGame() {
         {phase === 'intro' && (
           <BattleIntro
             playerName={nickname.trim()}
+            playerEmoji={playerEmoji}
             playerAttrs={playerAttrs!}
             aiCharacter={aiCharacter}
             onComplete={() => setPhase('resolution')}
@@ -179,19 +182,22 @@ function SoloGame() {
                 <p className="text-white/25 text-xs mt-1">Will be revealed soon...</p>
               </div>
 
-              <div className="w-full max-w-sm">
-                <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">
-                  Your Nickname
-                </label>
-                <input
-                  type="text"
-                  value={nickname}
-                  onChange={e => setNickname(e.target.value)}
-                  onKeyDown={e => e.key === 'Enter' && startGame()}
-                  placeholder="e.g. Gunslinger123"
-                  maxLength={20}
-                  className="text-lg font-bold mb-4"
-                />
+              <div className="w-full max-w-sm flex flex-col gap-4">
+                <EmojiPicker selected={playerEmoji} onSelect={setPlayerEmoji} />
+                <div>
+                  <label className="block text-white/60 text-xs uppercase tracking-widest mb-2">
+                    Your Nickname
+                  </label>
+                  <input
+                    type="text"
+                    value={nickname}
+                    onChange={e => setNickname(e.target.value)}
+                    onKeyDown={e => e.key === 'Enter' && startGame()}
+                    placeholder="e.g. Gunslinger123"
+                    maxLength={20}
+                    className="text-lg font-bold"
+                  />
+                </div>
                 <button
                   onClick={startGame}
                   disabled={!nickname.trim()}

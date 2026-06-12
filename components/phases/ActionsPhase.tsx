@@ -47,11 +47,11 @@ const BLOCK_LABELS = ['A', 'B', 'C', 'D']
 const BLOCK_ROUNDS = ['Rounds 1 & 5', 'Rounds 2 & 6', 'Rounds 3 & 7', 'Rounds 4 & 8']
 const DODGES: Dodge[] = ['still', 'dodge_right', 'dodge_left', 'duck']
 
-const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string }> = {
-  still:       { icon: '🎯', desc: '+3 Precision', color: '#64748b' },
-  dodge_right: { icon: '↗️', desc: 'Full: L.Shoulder + L.Arm · Head: −15 acc −15% dmg', color: '#a78bfa' },
-  dodge_left:  { icon: '↖️', desc: 'Full: R.Shoulder + R.Arm · Head: −15 acc −15% dmg', color: '#a78bfa' },
-  duck:        { icon: '⬇️', desc: 'Full: Head + Shoulders · Cannot aim head', color: '#2dc653' },
+const DODGE_META: Record<Dodge, { icon: string; desc: string; color: string; badges: { label: string; color: string }[] }> = {
+  still:       { icon: '🎯', desc: 'Gain +3 Precision this round', color: '#64748b', badges: [{ label: '+3 🎯', color: '#64748b' }] },
+  dodge_right: { icon: '↗️', desc: 'Full cover: L.Shoulder & L.Arm  ·  Head: −15 acc, −15% dmg', color: '#a78bfa', badges: [{ label: '🛡 Full L', color: '#2dc653' }, { label: '½ Head', color: '#f5c842' }] },
+  dodge_left:  { icon: '↖️', desc: 'Full cover: R.Shoulder & R.Arm  ·  Head: −15 acc, −15% dmg', color: '#a78bfa', badges: [{ label: '🛡 Full R', color: '#2dc653' }, { label: '½ Head', color: '#f5c842' }] },
+  duck:        { icon: '⬇️', desc: 'Full cover: Head & Shoulders  ·  Cannot aim at Head', color: '#2dc653', badges: [{ label: '🛡 Full Top', color: '#2dc653' }, { label: '🚫 Head', color: '#e63946' }] },
 }
 
 const TARGET_COLOR: Record<Target, string> = {
@@ -167,13 +167,16 @@ function TargetGrid({
                   transition: 'background 0.15s, border-color 0.15s',
                 }}
               >
-                <div className="flex items-center gap-3">
-                  <span className="text-sm font-black" style={{ color: isBlocked ? 'rgba(255,255,255,0.2)' : isSelected ? color : isFull ? '#2dc653' : isPartial ? '#f5c842aa' : 'rgba(255,255,255,0.6)' }}>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <span className="text-sm font-black" style={{ color: isBlocked ? 'rgba(255,255,255,0.2)' : isSelected ? color : isFull ? '#2dc653' : isPartial ? '#f5c842' : 'rgba(255,255,255,0.6)' }}>
                     {TARGET_LABELS[target]}
                   </span>
-                  {isFull    && !isSelected && <span className="text-xs">🛡</span>}
-                  {isPartial && !isSelected && <span className="text-xs opacity-60">½</span>}
+                  {isFull    && !isSelected && <span className="text-xs px-1 py-0.5 rounded-full font-bold" style={{ background: '#2dc65322', color: '#2dc653', border: '1px solid #2dc65355' }}>🛡 covered</span>}
+                  {isPartial && !isSelected && <span className="text-xs px-1 py-0.5 rounded-full font-bold" style={{ background: '#f5c84222', color: '#f5c842', border: '1px solid #f5c84255' }}>½ exposed</span>}
                   {isBlocked && <span className="text-xs opacity-40">🚫</span>}
+                  {(target === 'left_arm' || target === 'right_arm') && !isBlocked && (
+                    <span className="text-xs px-1 py-0.5 rounded-full font-bold" style={{ background: '#fb923c22', color: '#fb923c', border: '1px solid #fb923c55' }}>−1 🎯 opp</span>
+                  )}
                 </div>
                 <div className="flex items-center gap-2">
                   <span className="text-xs font-black" style={{ color: isBlocked ? 'rgba(255,255,255,0.2)' : color }}>
@@ -230,8 +233,15 @@ function DodgeGrid({
           >
             <span className="text-xl leading-none flex-shrink-0">{meta.icon}</span>
             <div className="flex-1 text-left">
-              <p className="text-sm font-black text-white">{DODGE_LABELS[d]}</p>
-              <p className="text-xs mt-0.5" style={{ color: isSelected ? meta.color : 'rgba(255,255,255,0.3)' }}>
+              <div className="flex items-center gap-1.5 flex-wrap">
+                <p className="text-sm font-black text-white">{DODGE_LABELS[d]}</p>
+                {meta.badges.map(b => (
+                  <span key={b.label} className="text-xs font-bold px-1.5 py-0.5 rounded-full" style={{ background: `${b.color}22`, color: b.color, border: `1px solid ${b.color}55` }}>
+                    {b.label}
+                  </span>
+                ))}
+              </div>
+              <p className="text-xs mt-0.5" style={{ color: isSelected ? meta.color : 'rgba(255,255,255,0.25)' }}>
                 {meta.desc}
               </p>
             </div>
