@@ -20,7 +20,7 @@ const SOLO_PHASES: { key: SoloPhase; label: string }[] = [
   { key: 'setup', label: 'Start' },
   { key: 'reveal', label: 'Reveal' },
   { key: 'attributes', label: 'Attributes' },
-  { key: 'actions', label: 'Actions' },
+  { key: 'actions', label: 'Planning' },
   { key: 'intro', label: 'VS' },
   { key: 'resolution', label: 'Duel' },
 ]

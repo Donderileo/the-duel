@@ -223,7 +223,7 @@ export default function ActionsPhase({ onConfirm, opponentReady, myReady }: Acti
       {/* Header */}
       <div className="text-center">
         <h2 className="text-2xl font-black uppercase tracking-widest" style={{ color: '#f5c842' }}>
-          Plan Actions
+          Planning
         </h2>
         <p className="text-white/40 text-xs mt-1">Set up 4 blocks · each covers 2 rounds</p>
       </div>

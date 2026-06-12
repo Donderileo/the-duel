@@ -8,9 +8,10 @@ interface CampaignMapProps {
   campaignState: CampaignState
   onFight: () => void
   onReset: () => void
+  onChangePlan: () => void
 }
 
-export default function CampaignMap({ campaignState, onFight, onReset }: CampaignMapProps) {
+export default function CampaignMap({ campaignState, onFight, onReset, onChangePlan }: CampaignMapProps) {
   const { currentLevelIndex, levelsCompleted, playerBonusPoints, difficulty, playerNickname, campaignComplete } = campaignState
   const totalBudget = 10 + playerBonusPoints
 
@@ -87,9 +88,19 @@ export default function CampaignMap({ campaignState, onFight, onReset }: Campaig
       </div>
 
       {!campaignComplete && (
-        <button onClick={onFight} className="btn-gold w-full max-w-sm py-4 text-lg">
-          ⚔️ Fight {AI_CHARACTERS.find(c => c.id === CAMPAIGN_ORDER[currentLevelIndex])?.name}
-        </button>
+        <div className="w-full max-w-sm flex flex-col gap-2">
+          <button onClick={onFight} className="btn-gold w-full py-4 text-lg">
+            ⚔️ Fight {AI_CHARACTERS.find(c => c.id === CAMPAIGN_ORDER[currentLevelIndex])?.name}
+          </button>
+          {campaignState.playerActions && (
+            <button
+              onClick={onChangePlan}
+              className="btn-ghost w-full py-3 text-sm"
+            >
+              📋 Change Planning
+            </button>
+          )}
+        </div>
       )}
 
       <button

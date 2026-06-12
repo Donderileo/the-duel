@@ -45,7 +45,7 @@ type CampaignPhase =
 const PHASE_LABELS: { key: CampaignPhase; label: string }[] = [
   { key: 'reveal', label: 'Reveal' },
   { key: 'attributes', label: 'Attributes' },
-  { key: 'actions', label: 'Actions' },
+  { key: 'actions', label: 'Planning' },
   { key: 'intro', label: 'VS' },
   { key: 'resolution', label: 'Duel' },
 ]
@@ -84,6 +84,7 @@ export default function CampaignPage() {
   const [difficulty, setDifficulty] = useState<CampaignDifficulty>('easy')
   const [playerAttrs, setPlayerAttrs] = useState<Attributes | null>(null)
   const [results, setResults] = useState<RoundResult[] | null>(null)
+  const [planningFromMap, setPlanningFromMap] = useState(false)
   const hasLoaded = useRef(false)
 
   // Load saved campaign state on mount
@@ -119,28 +120,37 @@ export default function CampaignPage() {
     setPhase('reveal')
   }
 
+  function handleChangePlan() {
+    setPlanningFromMap(true)
+    setPhase('actions')
+  }
+
   function handleRevealContinue() {
     setPhase('attributes')
   }
 
   function handleAttributesConfirm(attrs: Attributes) {
     setPlayerAttrs(attrs)
-    setPhase('actions')
+    // Skip planning if already saved — reuse existing plan
+    if (campaignState?.playerActions) {
+      runSimulation(attrs, campaignState.playerActions)
+    } else {
+      setPhase('actions')
+    }
   }
 
-  function handleActionsConfirm(actions: ActionBlock[]) {
-    if (!campaignState || !playerAttrs) return
+  function runSimulation(attrs: Attributes, actions: ActionBlock[]) {
+    if (!campaignState) return
     const levelIndex = campaignState.currentLevelIndex
     const char = getCampaignCharacter(levelIndex)
     const scaledAttrs = scaleCharacterAttributes(char, CAMPAIGN_AI_BUDGETS[char.id])
-    const aiChar = { ...char, attributes: scaledAttrs }
-    const aiActions = generateAIActions(aiChar)
+    const aiActions = generateAIActions({ ...char, attributes: scaledAttrs })
 
     const humanPlayer: Player = {
       id: 'human',
       nickname: campaignState.playerNickname,
       isHost: true,
-      attributes: playerAttrs,
+      attributes: attrs,
       actions,
       ready: true,
     }
@@ -155,6 +165,24 @@ export default function CampaignPage() {
 
     setResults(simulateGame(humanPlayer, aiPlayer))
     setPhase('intro')
+  }
+
+  async function handleActionsConfirm(actions: ActionBlock[]) {
+    if (!campaignState) return
+    // Save plan to campaign state
+    const newState = { ...campaignState, playerActions: actions }
+    await saveCampaignState(newState)
+    setCampaignState(newState)
+
+    if (planningFromMap) {
+      // Just updating the plan — go back to map
+      setPlanningFromMap(false)
+      setPhase('map')
+    } else {
+      // Coming from a fight flow — run simulation
+      if (!playerAttrs) return
+      runSimulation(playerAttrs, actions)
+    }
   }
 
   async function handleResolutionDone() {
@@ -355,6 +383,7 @@ export default function CampaignPage() {
                 campaignState={campaignState}
                 onFight={handleFight}
                 onReset={handleReset}
+                onChangePlan={handleChangePlan}
               />
             </motion.div>
           )}

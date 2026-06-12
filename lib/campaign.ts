@@ -1,4 +1,4 @@
-import type { Attributes } from '@/types/game'
+import type { Attributes, ActionBlock } from '@/types/game'
 import type { AICharacter } from '@/lib/aiCharacters'
 import { AI_CHARACTERS } from '@/lib/aiCharacters'
 
@@ -11,6 +11,7 @@ export interface CampaignState {
   currentLevelIndex: number
   playerBonusPoints: number
   playerAttrs: Attributes
+  playerActions: ActionBlock[] | null
   levelsCompleted: boolean[]
   campaignComplete: boolean
 }
@@ -131,6 +132,7 @@ export function createFreshCampaignState(
     currentLevelIndex: 0,
     playerBonusPoints: 0,
     playerAttrs: { precision: 0, damage: 0, reflexes: 0, resistance: 0 },
+    playerActions: null,
     levelsCompleted: Array(8).fill(false),
     campaignComplete: false,
   }

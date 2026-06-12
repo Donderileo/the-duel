@@ -213,7 +213,7 @@ function PhaseIndicator({ phase }: { phase: string }) {
   const phases = [
     { key: 'waiting', label: 'Room' },
     { key: 'attributes', label: 'Attributes' },
-    { key: 'actions', label: 'Actions' },
+    { key: 'actions', label: 'Planning' },
     { key: 'resolution', label: 'Duel' },
   ]
   const idx = phases.findIndex(p => p.key === phase)
