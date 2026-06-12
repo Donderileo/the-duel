@@ -13,6 +13,8 @@ import AttributesPhase from '@/components/phases/AttributesPhase'
 import ActionsPhase from '@/components/phases/ActionsPhase'
 import ResolutionPhase from '@/components/phases/ResolutionPhase'
 import JoinRoom from '@/components/JoinRoom'
+import BattleIntro, { type GenericOpponent } from '@/components/BattleIntro'
+import { AnimatePresence } from 'framer-motion'
 
 export default function RoomPage() {
   const params = useParams()
@@ -24,6 +26,7 @@ export default function RoomPage() {
   const [loading, setLoading] = useState(true)
   const [notFound, setNotFound] = useState(false)
   const [needJoin, setNeedJoin] = useState(false)
+  const [introPlayed, setIntroPlayed] = useState(false)
 
   const me = room && mySlot ? room[mySlot] : undefined
   const opponent = room && mySlot ? room[mySlot === 'player1' ? 'player2' : 'player1'] : undefined
@@ -111,6 +114,7 @@ export default function RoomPage() {
   }
 
   async function handlePlayAgain() {
+    setIntroPlayed(false)
     const resetPlayer = (p: Player | undefined) => p ? {
       ...p, attributes: undefined, actions: undefined, ready: false
     } : undefined
@@ -155,8 +159,27 @@ export default function RoomPage() {
   const p1Name = room.player1?.nickname ?? 'Player 1'
   const p2Name = room.player2?.nickname ?? 'Player 2'
 
+  const myAttrs = me.attributes
+  const opponentAsGeneric: GenericOpponent | undefined = opponent?.attributes
+    ? { name: opponent.nickname ?? 'Opponent', attributes: opponent.attributes, emoji: '🤠', color: '#e63946' }
+    : undefined
+
+  const showIntro = (room.phase === 'resolution' || room.phase === 'finished') &&
+    !!room.results && !!myAttrs && !!opponentAsGeneric && !introPlayed
+
   return (
     <div className="min-h-screen flex items-center justify-center relative" style={{ background: 'linear-gradient(135deg, #0a0a1a 0%, #1a0a2e 50%, #0a0a1a 100%)' }}>
+      <AnimatePresence>
+        {showIntro && myAttrs && opponentAsGeneric && (
+          <BattleIntro
+            playerName={mySlot === 'player1' ? p1Name : p2Name}
+            playerAttrs={myAttrs}
+            opponent={opponentAsGeneric}
+            onComplete={() => setIntroPlayed(true)}
+          />
+        )}
+      </AnimatePresence>
+
       <StarBackground count={40} />
 
       <div className="card-3d w-full max-w-lg sm:max-w-xl lg:max-w-3xl mx-4 p-6 sm:p-8 relative z-10">

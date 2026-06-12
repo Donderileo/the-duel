@@ -5,10 +5,19 @@ import { motion, AnimatePresence } from 'framer-motion'
 import type { AICharacter } from '@/lib/aiCharacters'
 import type { Attributes } from '@/types/game'
 
+export interface GenericOpponent {
+  name: string
+  attributes: Attributes
+  emoji?: string
+  color?: string
+  title?: string
+}
+
 interface BattleIntroProps {
   playerName: string
   playerAttrs: Attributes
-  aiCharacter: AICharacter
+  aiCharacter?: AICharacter
+  opponent?: GenericOpponent
   onComplete: () => void
 }
 
@@ -81,7 +90,12 @@ function AttrTable({
   )
 }
 
-export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onComplete }: BattleIntroProps) {
+export default function BattleIntro({ playerName, playerAttrs, aiCharacter, opponent, onComplete }: BattleIntroProps) {
+  const opp: GenericOpponent = aiCharacter
+    ? { name: aiCharacter.name, attributes: aiCharacter.attributes, emoji: aiCharacter.emoji, color: aiCharacter.color, title: aiCharacter.title }
+    : opponent ?? { name: 'Opponent', attributes: { precision: 0, damage: 0, reflexes: 0, resistance: 0 } }
+  const oppColor = opp.color ?? '#e63946'
+  const oppEmoji = opp.emoji ?? '🤠'
   const [elapsed, setElapsed] = useState(0)
   const [showFighters, setShowFighters] = useState(false)
   const [showVs, setShowVs] = useState(false)
@@ -136,7 +150,7 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onCo
         className="absolute right-0 top-0 bottom-0 w-1/2 pointer-events-none"
         animate={{ opacity: showFighters ? 1 : 0 }}
         transition={{ duration: 1 }}
-        style={{ background: `radial-gradient(ellipse at 80% 50%, ${aiCharacter.color}18 0%, transparent 70%)` }}
+        style={{ background: `radial-gradient(ellipse at 80% 50%, ${oppColor}18 0%, transparent 70%)` }}
       />
 
       {/* Main content */}
@@ -214,16 +228,18 @@ export default function BattleIntro({ playerName, playerAttrs, aiCharacter, onCo
                   animate={{ y: [0, -6, 0] }}
                   transition={{ duration: 3, repeat: Infinity, ease: 'easeInOut', delay: 0.5 }}
                   className="text-7xl mb-2"
-                  style={{ filter: `drop-shadow(0 0 18px ${aiCharacter.color}66)` }}
+                  style={{ filter: `drop-shadow(0 0 18px ${oppColor}66)` }}
                 >
-                  {aiCharacter.emoji}
+                  {oppEmoji}
                 </motion.div>
-                <p className="text-lg font-black tracking-wide text-white leading-tight">{aiCharacter.name}</p>
-                <p className="text-xs uppercase tracking-widest" style={{ color: aiCharacter.color }}>
-                  {aiCharacter.title}
-                </p>
+                <p className="text-lg font-black tracking-wide text-white leading-tight">{opp.name}</p>
+                {opp.title && (
+                  <p className="text-xs uppercase tracking-widest" style={{ color: oppColor }}>
+                    {opp.title}
+                  </p>
+                )}
 
-                <AttrTable attrs={aiCharacter.attributes} color={aiCharacter.color} align="right" show={showAttrs} />
+                <AttrTable attrs={opp.attributes} color={oppColor} align="right" show={showAttrs} />
               </motion.div>
             )}
           </AnimatePresence>
