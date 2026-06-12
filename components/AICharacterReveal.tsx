@@ -9,9 +9,10 @@ interface AICharacterRevealProps {
   character: AICharacter
   onContinue: () => void
   instant?: boolean // skip slot-machine animation (campaign mode)
+  onFightNow?: () => void // campaign: go straight to battle (skip planning)
 }
 
-export default function AICharacterReveal({ character, onContinue, instant }: AICharacterRevealProps) {
+export default function AICharacterReveal({ character, onContinue, instant, onFightNow }: AICharacterRevealProps) {
   const [slotStep, setSlotStep] = useState(instant ? 16 : 0)
   const revealed = slotStep >= 16
 
@@ -105,15 +106,27 @@ export default function AICharacterReveal({ character, onContinue, instant }: AI
 
       <AnimatePresence>
         {revealed && (
-          <motion.button
+          <motion.div
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.6 }}
-            onClick={onContinue}
-            className="btn-gold w-full max-w-sm py-4 text-lg"
+            className="w-full max-w-sm flex flex-col gap-2"
           >
-            ⚔️ Accept Challenge
-          </motion.button>
+            {onFightNow ? (
+              <>
+                <button onClick={onFightNow} className="btn-gold w-full py-4 text-lg">
+                  ⚔️ Fight Now
+                </button>
+                <button onClick={onContinue} className="btn-ghost w-full py-3 text-sm">
+                  📋 Edit Planning
+                </button>
+              </>
+            ) : (
+              <button onClick={onContinue} className="btn-gold w-full py-4 text-lg">
+                ⚔️ Accept Challenge
+              </button>
+            )}
+          </motion.div>
         )}
       </AnimatePresence>
     </div>

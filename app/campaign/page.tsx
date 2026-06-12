@@ -112,12 +112,17 @@ export default function CampaignPage() {
   function handleFight() { setPhase('reveal') }
 
   function handleRevealContinue() {
-    // First fight: need to set attributes. Subsequent: skip to actions or straight to fight
+    // "Edit Planning" button — always go to actions (or attributes if first fight)
     if (!campaignState) return
-    const hasAttrs = campaignState.playerBonusPoints > 0 ||
-      (campaignState.playerAttrs.precision + campaignState.playerAttrs.damage +
-       campaignState.playerAttrs.reflexes + campaignState.playerAttrs.resistance) > 0
+    const hasAttrs = (campaignState.playerAttrs.precision + campaignState.playerAttrs.damage +
+      campaignState.playerAttrs.reflexes + campaignState.playerAttrs.resistance) > 0
     setPhase(hasAttrs ? 'actions' : 'attributes')
+  }
+
+  function handleRevealFightNow() {
+    // "Fight Now" — skip planning, run with saved attrs + actions
+    if (!campaignState || !playerAttrs || !campaignState.playerActions) return
+    runSimulation(playerAttrs, campaignState.playerActions)
   }
 
   function handleAttributesConfirm(attrs: Attributes) {
@@ -313,7 +318,12 @@ export default function CampaignPage() {
           {/* REVEAL */}
           {phase === 'reveal' && currentChar && (
             <motion.div key="reveal" initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }} exit={{ opacity: 0, scale: 0.95 }}>
-              <AICharacterReveal character={currentChar} onContinue={handleRevealContinue} instant />
+              <AICharacterReveal
+                character={currentChar}
+                onContinue={handleRevealContinue}
+                onFightNow={campaignState?.playerActions ? handleRevealFightNow : undefined}
+                instant
+              />
             </motion.div>
           )}
 
