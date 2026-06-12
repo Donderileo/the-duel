@@ -8,6 +8,8 @@ interface AttributesPhaseProps {
   onConfirm: (attrs: Attributes) => void
   opponentReady: boolean
   myReady: boolean
+  pointBudget?: number
+  initialAttrs?: Attributes
 }
 
 const ATTR_KEYS: (keyof Attributes)[] = ['precision', 'damage', 'reflexes', 'resistance']
@@ -30,11 +32,12 @@ const ATTR_ICONS: Record<keyof Attributes, string> = {
   resistance: '🛡️',
 }
 
-const MAX_POINTS = 10
-const MAX_PER_ATTR = 8
-
-export default function AttributesPhase({ onConfirm, opponentReady, myReady }: AttributesPhaseProps) {
-  const [attrs, setAttrs] = useState<Attributes>({ precision: 0, damage: 0, reflexes: 0, resistance: 0 })
+export default function AttributesPhase({ onConfirm, opponentReady, myReady, pointBudget, initialAttrs }: AttributesPhaseProps) {
+  const MAX_POINTS = pointBudget ?? 10
+  const MAX_PER_ATTR = Math.max(8, Math.floor(MAX_POINTS * 0.6))
+  const [attrs, setAttrs] = useState<Attributes>(
+    initialAttrs ?? { precision: 0, damage: 0, reflexes: 0, resistance: 0 }
+  )
 
   const used = attrs.precision + attrs.damage + attrs.reflexes + attrs.resistance
   const remaining = MAX_POINTS - used
@@ -122,7 +125,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
       {/* Status */}
       <div className="flex gap-4 text-xs">
         <span style={{ color: myReady ? '#2dc653' : '#f5c842' }}>
-          {myReady ? '✓ You: Ready' : `You: ${used}/10 pts`}
+          {myReady ? '✓ You: Ready' : `You: ${used}/${MAX_POINTS} pts`}
         </span>
         <span style={{ color: opponentReady ? '#2dc653' : 'rgba(255,255,255,0.3)' }}>
           {opponentReady ? '✓ Opponent: Ready' : '○ Opponent: choosing...'}
@@ -135,7 +138,7 @@ export default function AttributesPhase({ onConfirm, opponentReady, myReady }: A
           disabled={used !== MAX_POINTS}
           className="btn-gold w-full max-w-sm py-4 text-lg"
         >
-          {used === MAX_POINTS ? '🎯 Confirm Attributes' : `Use all ${MAX_POINTS} points`}
+          {used === MAX_POINTS ? '🎯 Confirm Attributes' : `Use all ${MAX_POINTS} points (${MAX_POINTS - used} remaining)`}
         </button>
       )}
 

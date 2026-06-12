@@ -127,6 +127,10 @@ export default function Home() {
           >
             🤖 Play vs Computer
           </Link>
+
+          <Link href="/campaign" className="btn-ghost w-full py-4 text-lg text-center block">
+            🏆 Campaign
+          </Link>
         </div>
 
         <p className="text-center text-white/30 text-xs mt-6">
